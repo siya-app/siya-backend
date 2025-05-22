@@ -1,0 +1,31 @@
+{
+  "name": "apperitiu-bcn-node-sql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OhMyLaia/apperitiu-bcn-node-sql.git"
+  },
+  "author": "ohmylaia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OhMyLaia/apperitiu-bcn-node-sql/issues"
+  },
+  "homepage": "https://github.com/OhMyLaia/apperitiu-bcn-node-sql#readme",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@types/express": "^4.17.1",
+    "eslint": "^9.27.0",
+    "globals": "^16.1.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
