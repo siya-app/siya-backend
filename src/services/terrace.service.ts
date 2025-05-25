@@ -5,7 +5,7 @@ import { ENV } from '../config/env.js';
 
 const TERRACE_API: string = ENV.TERRACE_API_URL || "";
 
-if (!process.env.TERRACE_API_URL) {
+if (!TERRACE_API) {
     throw new Error("Environment variable TERRACE_API_URL is not defined");
 }
 

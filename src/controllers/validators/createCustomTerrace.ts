@@ -1,5 +1,5 @@
-import { BusinessApiType } from "../models/zod/business-schema.js";
-import { TerraceApiType } from "../models/zod/terrace-schema.js";
+import { BusinessApiType } from "../../models/zod/business-schema.js";
+import { TerraceApiType } from "../../models/zod/terrace-schema.js";
 
 export function createCustomTerrace(terrace: TerraceApiType, biz: BusinessApiType) {
     return {

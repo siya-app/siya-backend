@@ -1,12 +1,12 @@
 import { fetchAllDataFromApis } from "../services/all.data.service.js";
 import { matchByCoords } from "./validators/coordsValidator.js";
 import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
-import { createCustomTerrace } from "./createCustomTerrace.js";
+import { createCustomTerrace } from "./validators/createCustomTerrace.js";
 import type { TerraceApiType } from "../models/zod/terrace-schema.js";
 import type { BusinessApiType } from "../models/zod/business-schema.js";
 import Terrace from "../models/terrace-model-sequelize.js";
 
-export async function terraceValidator() {
+export async function createCustomValidatedTerrace() {
 
     const { businesses, terraces } = await fetchAllDataFromApis();
     let customTerraces: any[] = [];
@@ -70,7 +70,8 @@ export async function terraceValidator() {
     }
 }
 
-terraceValidator();
+// aqui iria el cron
+createCustomValidatedTerrace();
 
 // for (let i = 0; i < terraces.length; i++) {
 //     const terrace = terraces[i] as TerraceApiType;

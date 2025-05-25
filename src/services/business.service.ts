@@ -4,7 +4,7 @@ import { ENV } from '../config/env.js';
 
 const BUSINESS_API: string = ENV.BUSINESS_API_URL || "";
 
-if (!process.env.BUSINESS_API_URL) {
+if (!BUSINESS_API) {
     throw new Error("Environment variable BUSINESS_API_URL is not defined");
 }
 
