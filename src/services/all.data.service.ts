@@ -1,7 +1,7 @@
-import { fetchDataBusiness } from "./business.service";
-import { fetchDataTerraces } from "./terrace.service";
-import type { BusinessApiType } from "../models/zod/business-schema";
-import type { TerraceApiType } from "../models/zod/terrace-schema";
+import { fetchDataBusiness } from "./business.service.js";
+import { fetchDataTerraces } from "./terrace.service.js";
+import type { BusinessApiType } from "../models/zod/business-schema.js";
+import type { TerraceApiType } from "../models/zod/terrace-schema.js";
 
 export async function fetchAllDataFromApis() {
     const [businesses, terraces] = await Promise.all([

@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../config/sequelize-config'
+import { sequelize } from '../config/sequelize-config.js'
 
 class Terrace extends Model { 
     public id!: string;

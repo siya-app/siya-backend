@@ -1,5 +1,5 @@
-import { createApiInstance } from '../config/api-connection-config'
-import { axiosRequest } from '../config/api-connection-service';
+import { createApiInstance } from '../config/api-connection-config.js'
+import { axiosRequest } from '../config/api-connection-service.js';
 
 const API_TERRACE: string = process.env.TERRACE_API_URL || "";
 

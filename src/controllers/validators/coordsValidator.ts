@@ -1,18 +1,13 @@
-import type { BusinessApiType } from "../../models/zod/business-schema";
-import { TerraceApiType } from "../../models/zod/terrace-schema";
+import type { BusinessApiType } from "../../models/zod/business-schema.js";
+import { TerraceApiType } from "../../models/zod/terrace-schema.js";
 
-export function objectsMatchByCoords(businesses: BusinessApiType[], terraces: TerraceApiType[]) {
+export function matchByCoords(
+    businesses: BusinessApiType[],
+    terrace: TerraceApiType
+): BusinessApiType[] {
+    return businesses.filter(biz =>
+        biz.Latitud === terrace.LATITUD &&
+        biz.Longitud === terrace.LONGITUD
+    );
 
-    let businessMatchedByCoords: BusinessApiType[] = [];
-
-    for (let i = 0; i < terraces.length; i++) {
-
-        const terrace = terraces[i] as TerraceApiType;
-
-        businessMatchedByCoords = businesses.filter(biz =>
-            biz.Latitud === terrace.LATITUD &&
-            biz.Longitud === terrace.LONGITUD);
-    }
-
-    return businessMatchedByCoords;
 }

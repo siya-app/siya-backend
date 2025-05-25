@@ -1,5 +1,5 @@
-import { createApiInstance } from '../config/api-connection-config'
-import { axiosRequest } from '../config/api-connection-service';
+import { createApiInstance } from '../config/api-connection-config.js'
+import { axiosRequest } from '../config/api-connection-service.js';
 
 const BUSINESS_API: string = process.env.BUSINESS_API_URL || "";
 
