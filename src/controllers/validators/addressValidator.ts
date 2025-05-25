@@ -1,23 +1,96 @@
+import { matches } from "validator";
 import type { BusinessApiType } from "../../models/zod/business-schema.js";
 import { TerraceApiType } from "../../models/zod/terrace-schema.js";
 
-export function refineMatchByAddress(
+// export type InvalidMatch = {
+//     name: string,
+//     address: string
+//     lat: number,
+//     long: number
+// }
+
+// export type CoordResult = {
+//     matches: BusinessApiType[],
+//     invalidMatches: InvalidMatch[]
+// }
+
+// export function refineMatchByAddress(
+//     terrace: TerraceApiType,
+//     businesses: BusinessApiType[]
+// ): CoordResult | null {
+
+//     let validMatchesByAddress: BusinessApiType[] = [];
+//     let invalidMatchesByAddress: BusinessApiType[] = [];
+//     const emplacement = terrace.EMPLACAMENT.toLowerCase();
+//     if (businesses.length === 1) { return null
+
+//     } else {
+//         validMatchesByAddress = businesses.filter((biz) => {
+//             const matchStreetName = emplacement.includes(biz.Nom_Via.toLowerCase() ?? []);
+//             const matchStreetDoor = emplacement.includes(String(biz.Porta) ?? []);
+//             return matchStreetName && matchStreetDoor;
+//         });
+//     }
+// invalidMatchesByAddress.push(`invalid biz -> biz.name, biz.address...`)
+
+//     return {
+//         validMatchesByAddress,
+//         invalidMatches
+
+//     }
+// }
+export type InvalidMatch = {
+    name: string;
+    address: string;
+    lat: string;
+    long: string;
+    reason: 'MISSING_STREET' | 'MISSING_NUMBER' | 'BOTH_MISSING';
+}
+
+export type CoordResult = {
+    validMatches: BusinessApiType[];
+    invalidMatches: InvalidMatch[];
+}
+
+export function matchByCoordsAndAddress(
     terrace: TerraceApiType,
     businesses: BusinessApiType[]
-): BusinessApiType[] {
+): CoordResult | null {
 
-    let matchesByAddress: BusinessApiType[] = [];
-    let isMatching: boolean = false;
-    const emplacement = terrace.EMPLACAMENT.toLowerCase();
-    if (businesses.length === 1) {
-        return businesses;
-
-    } else {
-        matchesByAddress = businesses.filter((biz) => {
-            emplacement.includes(biz.Nom_Via.toLowerCase()) &&
-            emplacement.includes(biz.Porta)
-        });
+    if (businesses.length <= 1) {
+        return null;
     }
 
-    return matchesByAddress;
+    const result: CoordResult = {
+        validMatches: [],
+        invalidMatches: []
+    };
+
+    const emplacement = terrace.EMPLACAMENT.toLowerCase();
+
+    businesses.forEach(biz => {
+        const streetName = biz.Nom_Via?.toLowerCase() ?? '';
+        const streetNumber = biz.Porta ? String(biz.Porta) : '';
+        
+        const hasStreet = streetName && emplacement.includes(streetName);
+        const hasNumber = streetNumber && emplacement.includes(streetNumber);
+
+        if (hasStreet && hasNumber) {
+            result.validMatches.push(biz);
+        } else {
+            let reason: InvalidMatch['reason'] = 'BOTH_MISSING';
+            if (hasStreet && !hasNumber) reason = 'MISSING_NUMBER';
+            if (!hasStreet && hasNumber) reason = 'MISSING_STREET';
+
+            result.invalidMatches.push({
+                name: biz.Nom_CComercial || 'Unknown',
+                address: terrace.EMPLACAMENT,
+                lat: biz.Latitud,
+                long: biz.Longitud,
+                reason
+            });
+        }
+    });
+
+    return result;
 }

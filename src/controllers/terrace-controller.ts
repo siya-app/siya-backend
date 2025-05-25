@@ -1,5 +1,6 @@
 import { fetchAllDataFromApis } from "../services/all.data.service.js";
 import { matchByCoords } from "./validators/coordsValidator.js";
+import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
 import type { TerraceApiType } from "../models/zod/terrace-schema.js";
 import type { BusinessApiType } from "../models/zod/business-schema.js";
 
@@ -12,12 +13,12 @@ export async function terraceValidator() {
     for (let i = 0; i < terraces.length; i++) {
         const terrace = terraces[i] as TerraceApiType;
 
-        matchByCoords(businesses, terrace);
-        console.warn(matchByCoords(businesses, terrace));
+        matchByCoords(terrace, businesses);
+        if (matchByCoords !== null) {
+            matchByCoordsAndAddress(terrace,businesses);
+        }
     }
 }
-// console.log('--- DEBUG: About to call terraceValidator ---');
-// terraceValidator().catch(err => console.error('Validator error:', err));
 
 terraceValidator();
 
