@@ -52,6 +52,10 @@ export type CoordResult = {
     invalidMatches: InvalidMatch[];
 }
 
+function normalizeString(s: string): string {
+    return s.toLowerCase().replace(/[^\w\s]/g, '').trim();
+}
+
 export function matchByCoordsAndAddress(
     terrace: TerraceApiType,
     businesses: BusinessApiType[]
@@ -66,12 +70,12 @@ export function matchByCoordsAndAddress(
         invalidMatches: []
     };
 
-    const emplacement = terrace.EMPLACAMENT.toLowerCase();
+    const emplacement = normalizeString(terrace.EMPLACAMENT);
 
     businesses.forEach(biz => {
-        const streetName = biz.Nom_Via?.toLowerCase() ?? '';
+        const streetName = normalizeString(biz.Nom_Via) ?? '';
         const streetNumber = biz.Porta ? String(biz.Porta) : '';
-        
+
         const hasStreet = streetName && emplacement.includes(streetName);
         const hasNumber = streetNumber && emplacement.includes(streetNumber);
 
