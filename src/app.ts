@@ -7,8 +7,8 @@ import { terraceValidator } from './controllers/terrace-controller.js';
 console.log('--- STARTUP TEST LOG ---');
 
 console.log('Environment loaded:', {
-    apiUrl: process.env.BUSINESS_API_URL,
-    nodeEnv: process.env.NODE_ENV
+    apiUrl1: process.env.BUSINESS_API_URL,
+    apiUrl2: process.env.TERRACE_API_URL
 });
 
 // listens to silent errors

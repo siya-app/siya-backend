@@ -1,7 +1,8 @@
 import { createApiInstance } from '../config/api-connection-config.js'
 import { axiosRequest } from '../config/api-connection-service.js';
+import { ENV } from '../config/env.js';
 
-const BUSINESS_API: string = process.env.BUSINESS_API_URL || "";
+const BUSINESS_API: string = ENV.BUSINESS_API_URL || "";
 
 if (!process.env.BUSINESS_API_URL) {
     throw new Error("Environment variable BUSINESS_API_URL is not defined");

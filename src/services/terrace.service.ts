@@ -1,20 +1,20 @@
 import { createApiInstance } from '../config/api-connection-config.js'
 import { axiosRequest } from '../config/api-connection-service.js';
-import { ENV } from '../config/env.js'
+import { ENV } from '../config/env.js';
 
 
-const API_TERRACE: string = ENV.BUSINESS_API_URL || "";
+const TERRACE_API: string = ENV.TERRACE_API_URL || "";
 
 if (!process.env.TERRACE_API_URL) {
     throw new Error("Environment variable TERRACE_API_URL is not defined");
 }
 
-const apiTerrace = createApiInstance(API_TERRACE);
+const apiTerrace = createApiInstance(TERRACE_API);
 
 export async function fetchDataTerraces(): Promise<object[]> {
 
     try {
-        const response = await axiosRequest(apiTerrace, API_TERRACE);
+        const response = await axiosRequest(apiTerrace, TERRACE_API);
         console.log("✅ Received data:", response);
 
         const records = response.result.records;
