@@ -13,7 +13,7 @@ export async function terraceValidator() {
         const terrace = terraces[i] as TerraceApiType;
 
         matchByCoords(businesses, terrace);
-        console.log(matchByCoords(businesses, terrace));
+        console.warn(matchByCoords(businesses, terrace));
     }
 }
 

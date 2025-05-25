@@ -1,14 +1,33 @@
+// {
+//   "compilerOptions": {
+//     "module": "ESNext",
+//     "esModuleInterop": true,
+//     "target": "es6",
+//     "experimentalDecorators": true,
+//     "emitDecoratorMetadata": true,
+//     "moduleResolution": "Nodenext",
+//     "sourceMap": true,
+//     "outDir": "dist"
+//   },
+//   "lib": ["es2015"]
+// }
+
 {
   "compilerOptions": {
     "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
     "esModuleInterop": true,
-    "target": "es6",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "moduleResolution": "Nodenext",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "lib": ["ES2022"],
+    "types": ["node"]
   },
-  "lib": ["es2015"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
 

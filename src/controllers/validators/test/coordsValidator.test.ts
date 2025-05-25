@@ -9,6 +9,9 @@ describe('matchByCoords', () => {
 
     const terrace = { LATITUD: '41.123', LONGITUD: '2.123', EMPLACAMENT: 'Av. Gaudí, 66' };
 
+    const result = matchByCoords(businesses, terrace);
+    console.log("✅ Result:", result);
+
     it('should return only matching businesses by coords', () => {
         const result = matchByCoords(businesses, terrace);
         expect(result.length).toBe(1);
