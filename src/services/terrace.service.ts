@@ -1,7 +1,9 @@
 import { createApiInstance } from '../config/api-connection-config.js'
 import { axiosRequest } from '../config/api-connection-service.js';
+import { ENV } from '../config/env.js'
 
-const API_TERRACE: string = process.env.TERRACE_API_URL || "";
+
+const API_TERRACE: string = ENV.BUSINESS_API_URL || "";
 
 if (!process.env.TERRACE_API_URL) {
     throw new Error("Environment variable TERRACE_API_URL is not defined");

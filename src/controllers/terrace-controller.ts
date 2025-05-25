@@ -16,6 +16,8 @@ export async function terraceValidator() {
         console.warn(matchByCoords(businesses, terrace));
     }
 }
+// console.log('--- DEBUG: About to call terraceValidator ---');
+// terraceValidator().catch(err => console.error('Validator error:', err));
 
 terraceValidator();
 
