@@ -1,6 +1,6 @@
 import { TerraceApiType } from "../../models/zod/terrace-schema.js"
 
-const terraces: TerraceApiType = [
+export const terraces: TerraceApiType = [
     {
         LATITUD: "41.4102259966535",
         CODI_DISTRICTE: "2",
