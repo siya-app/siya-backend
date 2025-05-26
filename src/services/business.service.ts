@@ -15,19 +15,19 @@ const apiBusiness = createApiInstance(BUSINESS_API);
 export async function fetchDataBusiness(): Promise<object[]> {
 
     try {
-        const response = await axiosRequest(apiBusiness, BUSINESS_API);
-        console.log("✅ Received data from api business");
+        const response = await axiosRequest(apiBusiness, BUSINESS_API, {limit: 3});
+        // console.log("✅👔 Received data from api business");
         // console.log("✅ Received data:", response.Nom_CComercial);
 
-        const records = response.result.records;
+        const records = response?.result?.records;
         if (!records) return [];
 
-        console.log("✅ Received businesses data.records");
-        // console.log("✅ Received businesses data.records:", records);
+        // console.log("✅ Received businesses data.records");
+        console.warn("✅👔 Received data from api businesses:", records.length);
         return records;
 
     } catch(error) {
-        console.log("❌ Error fetching terraces, error:", error);
+        console.log("❌ Error fetching businesses, error:", error);
         return [];
     }
 }

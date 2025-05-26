@@ -17,6 +17,9 @@ export async function createCustomValidatedTerrace() {
 
         let matchingRestaurants = matchByCoords(terrace, businesses);
 
+        // if(matchingRestaurants !== null ) console.warn(matchingRestaurants[0])
+        
+
         if (!matchingRestaurants || matchingRestaurants.length === 0) {
             // No coords match → add to unmatched for manual review
             unmatchedTerraces.push(terrace);
@@ -28,37 +31,41 @@ export async function createCustomValidatedTerrace() {
             const custom = createCustomTerrace(terrace, matchingRestaurants[0]);
             customTerraces.push(custom);
             continue;
-        }
 
-        if (matchingRestaurants !== null) {
+        } else {
             const { validMatches, invalidMatches } = matchByCoordsAndAddress(terrace, matchingRestaurants) || {};
 
             if (!validMatches || validMatches.length !== 1) {
+                console.warn(terrace)
                 unmatchedTerraces.push(terrace);
+
             } else {
-                const custom = createCustomTerrace(terrace, validMatches[i]);
-                customTerraces.push(custom);
+                // const custom = createCustomTerrace(terrace, validMatches[i]);
+                // console.log(`custom -> ${custom}, validMatches[i] -> ${validMatches[i]}`)
+                // customTerraces.push(custom);
+                console.log(`here we would create a terrace if it is a valid match`)
             }
-            
+
         }
     }
 
     try {
         if (customTerraces.length > 0) {
-            await Terrace.bulkCreate(customTerraces, {
-                updateOnDuplicate: [
-                    'business_name',
-                    'tables',
-                    'seats',
-                    'opening_hours',
-                    'average_price',
-                    'average_rating',
-                    'has_wifi',
-                    'pet_friendly',
-                    'can_smoke',
-                    'has_kitchen'
-                ]
-            })
+            // await Terrace.bulkCreate(customTerraces, {
+            //     updateOnDuplicate: [
+            //         'business_name',
+            //         'tables',
+            //         'seats',
+            //         'opening_hours',
+            //         'average_price',
+            //         'average_rating',
+            //         'has_wifi',
+            //         'pet_friendly',
+            //         'can_smoke',
+            //         'has_kitchen'
+            //     ]
+            // })
+            console.log(`customterraces is bigger than zero wiiii - the object would be created`)
         }
         console.log(`Inserted or updated ${customTerraces.length} terraces.`);
 
@@ -73,7 +80,7 @@ export async function createCustomValidatedTerrace() {
 
 
 // aqui iria el cron
-createCustomValidatedTerrace();
+// createCustomValidatedTerrace();
 
 // for (let i = 0; i < terraces.length; i++) {
 //     const terrace = terraces[i] as TerraceApiType;

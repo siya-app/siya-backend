@@ -47,10 +47,10 @@ export type InvalidMatch = {
     reason: 'MISSING_STREET' | 'MISSING_NUMBER' | 'BOTH_MISSING';
 }
 
-export type CoordResult = {
-    validMatches: BusinessApiType[];
-    invalidMatches: InvalidMatch[];
-}
+// export type CoordResult = {
+//     validMatches: BusinessApiType[];
+//     invalidMatches: InvalidMatch[];
+// }
 
 function normalizeString(s: string): string {
     return s.toLowerCase().replace(/[^\w\s]/g, '').trim();
@@ -59,16 +59,15 @@ function normalizeString(s: string): string {
 export function matchByCoordsAndAddress(
     terrace: TerraceApiType,
     businesses: BusinessApiType[]
-): CoordResult | null {
+) {
 
-    if (businesses.length <= 1) {
-        return null;
-    }
+    const validMatches: object[] = [];
+    const invalidMatches: object[] = [];
 
-    const result: CoordResult = {
-        validMatches: [],
-        invalidMatches: []
-    };
+    // const result: CoordResult = {
+    //     validMatches: [],
+    //     invalidMatches: []
+    // };
 
     const emplacement = normalizeString(terrace.EMPLACAMENT);
 
@@ -80,13 +79,14 @@ export function matchByCoordsAndAddress(
         const hasNumber = streetNumber && emplacement.includes(streetNumber);
 
         if (hasStreet && hasNumber) {
-            result.validMatches.push(biz);
+            validMatches.push(biz);
+
         } else {
             let reason: InvalidMatch['reason'] = 'BOTH_MISSING';
             if (hasStreet && !hasNumber) reason = 'MISSING_NUMBER';
             if (!hasStreet && hasNumber) reason = 'MISSING_STREET';
 
-            result.invalidMatches.push({
+            invalidMatches.push({
                 name: biz.Nom_CComercial || 'Unknown',
                 address: terrace.EMPLACAMENT,
                 lat: biz.Latitud,
@@ -96,5 +96,8 @@ export function matchByCoordsAndAddress(
         }
     });
 
-    return result;
+    return {
+        validMatches,
+        invalidMatches
+    };
 }

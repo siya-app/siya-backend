@@ -14,14 +14,20 @@ const apiTerrace = createApiInstance(TERRACE_API);
 export async function fetchDataTerraces(): Promise<object[]> {
 
     try {
-        const response = await axiosRequest(apiTerrace, TERRACE_API);
-        console.log("✅ Received data from api terraces");
-        // console.log("✅ Received data:", response);
+        const response = await axiosRequest(apiTerrace, TERRACE_API, {limit: 3});
 
-        const records = response.result.records;
-        if (!records) return [];
+        // if (!response || !response.result) {
+        //     console.log("❌ API terrace response was null or invalid");
+        //     return [];
+        // }
+        
+        const records = response?.result?.records;
+        if (!records || records.length === 0) {
+            console.log("❌ No terrace records found");
+            // return []
+        }
 
-        console.log("✅ Received terraces data.records");
+        console.warn("✅🍸 Received data from api terraces,", records.length);
         // console.log("✅ Received terraces data.records:", records);
         return records;
 
