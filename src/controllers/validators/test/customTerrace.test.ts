@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createCustomValidatedTerrace } from '../../terrace-controller.js';
+import { createCustomValidatedTerrace } from '../../terrace.controller.js';
 import Terrace from '../../../models/terrace-model-sequelize.js';
 import { matchByCoords } from '../coordsValidator.js';
 import { matchByCoordsAndAddress } from '../addressValidator.js';
+import { mockCreateCustomTerrace } from '../../../services/mockData/mockCustomTerrace.js';
 
 // --- Hardcoded Data ---
 const terraceMock = {

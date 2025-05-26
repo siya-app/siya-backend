@@ -10,3 +10,9 @@ export async function fetchAllDataFromApis() {
     ])
     return { businesses, terraces }
 };
+
+export async function fetchAllMockData() {
+    const [businesses, terraces] = await Promise.all([
+        
+    ])
+}

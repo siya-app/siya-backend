@@ -23,7 +23,7 @@ export const TerraceSchema = z.object({
     X_ETRS89: z.string(),
     Y_ETRS89: z.string(),
     _id: z.number()
-})
+}).passthrough();
 
 export type TerraceApiType = z.infer<typeof TerraceSchema>;
 

@@ -17,6 +17,6 @@ export const BusinessSchema = z.object({
     Codi_Grup_Activitat: z.string(),
     Nom_Districte: z.string(),
     Nom_Barri: z.string(),
-});
+}).passthrough();;
 
 export type BusinessApiType = z.infer<typeof BusinessSchema>;

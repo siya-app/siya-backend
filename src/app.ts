@@ -2,7 +2,7 @@
 console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 import cors from 'cors';
-import { terraceValidator } from './controllers/terrace-controller.js';
+import { terraceValidator } from './controllers/terrace.controller.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -43,7 +43,11 @@ app.use(express.urlencoded({ extended: true })); // For form data
 // app.use(handleError);
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    //esto devuelve la respuesta que le da el controller
+    // el controller debe manejar la estructura de la respuesta
+    // la ruta es el trigger desde el frontend
+    // probar ruta con postman
+    res.send('mi api!');
 });
 
 app.listen(port, () => {

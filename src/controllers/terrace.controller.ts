@@ -12,7 +12,8 @@ export async function createCustomValidatedTerrace() {
     let customTerraces: any[] = [];
     const unmatchedTerraces: TerraceApiType[] = [];
 
-    for (const terrace of terraces) {
+    for (let i = 0; i < terraces.length ; i++) {
+        const terrace = terraces[i];
 
         let matchingRestaurants = matchByCoords(terrace, businesses);
 
@@ -35,7 +36,7 @@ export async function createCustomValidatedTerrace() {
             if (!validMatches || validMatches.length !== 1) {
                 unmatchedTerraces.push(terrace);
             } else {
-                const custom = createCustomTerrace(terrace, validMatches[0]);
+                const custom = createCustomTerrace(terrace, validMatches[i]);
                 customTerraces.push(custom);
             }
             
@@ -69,6 +70,7 @@ export async function createCustomValidatedTerrace() {
         console.error('❌ Error saving terraces to DB:', err);
     }
 }
+
 
 // aqui iria el cron
 createCustomValidatedTerrace();
