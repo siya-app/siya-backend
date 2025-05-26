@@ -2,7 +2,7 @@
 console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 import cors from 'cors';
-import { terraceValidator } from './controllers/terrace.controller.js';
+import { createCustomValidatedTerrace } from './controllers/terrace.controller.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -55,4 +55,4 @@ app.listen(port, () => {
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-terraceValidator().catch(err => console.error('Validator error:', err));
+createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));

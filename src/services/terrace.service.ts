@@ -15,12 +15,14 @@ export async function fetchDataTerraces(): Promise<object[]> {
 
     try {
         const response = await axiosRequest(apiTerrace, TERRACE_API);
-        console.log("✅ Received data:", response);
+        console.log("✅ Received data from api terraces");
+        // console.log("✅ Received data:", response);
 
         const records = response.result.records;
         if (!records) return [];
 
-        console.log("✅ Received terraces data.records:", records);
+        console.log("✅ Received terraces data.records");
+        // console.log("✅ Received terraces data.records:", records);
         return records;
 
     } catch(error) {
