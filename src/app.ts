@@ -2,7 +2,7 @@
 console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 import cors from 'cors';
-import { createCustomValidatedTerrace } from './controllers/terrace.controller.js';
+import { createCustomValidatedTerrace } from './controllers/terrace.validator.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
