@@ -1,21 +1,9 @@
-/**
- * Required External Modules and Interfaces
- */
-import { Router, Request, Response } from 'express';
 import Terrace from '../models/terrace-model-sequelize.js';
+import { Router, Request, Response } from 'express';
 import { CustomTerraceType } from '../models/zod/customTerrace-schema.js';
 
-/**
- * Router Definition
- */
-const router = Router();
-
-/**
- * Controller Definitions
- */
-
 // GET ALL items
-router.get("/terraces", async (req: Request, res: Response) => {
+export const getAllTerraces = async (req: Request, res: Response) => {
     try {
         const terraces = await Terrace.findAll();
         res.json(terraces);
@@ -25,11 +13,10 @@ router.get("/terraces", async (req: Request, res: Response) => {
         console.log(`Error fetching terraces: error ${error}`);
         res.status(500).json({error: "Error fetching terraces"})
     }
-});
+};
 
 // GET items/:id
-
-router.get("/terraces/:id", async (req: Request, res: Response) => {
+export const getTerraceById = async (req: Request, res: Response) => {
     const terraceID = req.params.id;
     // const { terrace } = req.body;
 
@@ -49,11 +36,10 @@ router.get("/terraces/:id", async (req: Request, res: Response) => {
         console.log(`Error fetching terrace ID-${terraceID}: error ${error}`);
         res.status(500).json({error: "Error fetching terrace"})
     }
-});
+};
 
 // POST items
-
-router.post("/terraces", async(req: Request, res: Response) => {
+export const createNewTerrace = async(req: Request, res: Response) => {
     const terraceData: CustomTerraceType = req.body;
 
     if (!terraceData || !terraceData.id) {
@@ -61,18 +47,17 @@ router.post("/terraces", async(req: Request, res: Response) => {
     }
 
     try {
-        const createdTerrace = await Terrace.create({ terrace });
+        const createdTerrace = await Terrace.create({ terraceData });
         res.status(201).json(createdTerrace);
 
     } catch (error) {
         console.error(`Error adding terrace: error ${error}`);
         res.status(500).json({ error: "Error adding terrace" })
     }
-});
+};
 
 // PUT items/:id
-
-router.put("/terraces/:id", async (req: Request, res: Response) => {
+export const updateTerrace = async (req: Request, res: Response) => {
     const terraceID = parseInt(req.params.id, 10);
     const { terrace } = req.body;
 
@@ -81,18 +66,17 @@ router.put("/terraces/:id", async (req: Request, res: Response) => {
     }
 
     try {
-        await Terrace.update( {terrace }, { where: { id: terraceID } });
+        await Terrace.update( { terrace }, { where: { id: terraceID } });
         res.sendStatus(200);
 
     } catch (error) {
         console.error(`Error updating terrace ID-${terraceID}: ${error}`);
         res.status(500).json({ error: "Error updating terrace" });
     }
-})
+};
 
 // DELETE items/:id
-
-router.delete("/terraces/:id", async (req: Request, res: Response) => {
+export const deleteTerrace = async (req: Request, res: Response) => {
     const terraceID = parseInt(req.params.id, 10);
 
     if (isNaN(terraceID) || !terraceID) {
@@ -107,6 +91,4 @@ router.delete("/terraces/:id", async (req: Request, res: Response) => {
         console.error(`Error deleting terrace ID-${terraceID}: ${error}`);
         res.status(500).json({ error: "Error deleting terrace", terraceID })
     }
-});
-
-export default router;
+};
