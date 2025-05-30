@@ -1,5 +1,6 @@
 import { BusinessApiType } from "../../models/zod/business-schema.js";
 import { TerraceApiType } from "../../models/zod/terrace-schema.js";
+import { defaultOpeningHours } from "../../utils/defaultOpeningHours.js";
 
 export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Partial<BusinessApiType>) {
     return {
@@ -27,20 +28,19 @@ export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Parti
         can_smoke: undefined,
         has_disabled_acces: undefined,
         has_kitchen: undefined,
+        has_promos: false,
+        reservation_fee: 0,
+        is_premium: false,
+        is_verified: false,
+        instagram_account: '',
+        food_category: [],
+        placement_type: [],
+        emotional_tags: [],
+        cover_type: [],
+        dietary_restrictions: [],
+        profile_pic: '',
+        opening_hours: defaultOpeningHours
     };
-
-    //     has_promos: false,
-//     reservation_fee: 0,
-//     is_premium: false,
-//     is_verified: false,
-//     instagram_account: '',
-//     food_category: undefined,
-//     placement_type: undefined,
-//     emotional_tags: [],
-//     cover_type: undefined,
-//     dietary_restrictions: undefined,
-//     profile_pic: undefined,
-//     opening_hours: undefined
 }
 
 // {

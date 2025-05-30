@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { typeValidator } from "../../utils/typeValidator.js";
 import { tagValidator } from "../../utils/tagValidator.js";
+import { defaultOpeningHours } from "../../utils/defaultOpeningHours.js";
 
 export const DietaryRestrictionSchema = z.enum([
     'Vegetarian', 'Vegan', 'NonVegetarian', 'GlutenFree'
@@ -150,7 +151,7 @@ export const CustomTerraceSchema = z.object({
     food_category: z.array(FoodCategorySchema).optional(),
     placement_type: z.array(PlacementTypeSchema).optional(),
     emotional_tags: z.array(EmotionalTagsSchema).optional(),
-    cover_type: CoverTypeSchema.optional(),
+    cover_type: z.array(CoverTypeSchema).optional(),
     profile_pic: z.string().optional(),
     has_promos: z.boolean(),
     reservation_fee: z.number(),
@@ -163,15 +164,7 @@ export const CustomTerraceSchema = z.object({
             (days) => new Set(days.map(day => day.day)).size === 7,
             { message: "All 7 unique days must be provided" }
         )
-        .default([
-            { day: "monday", hours: "00:00-00:00" },
-            { day: "tuesday", hours: "00:00-00:00" },
-            { day: "wednesday", hours: "00:00-00:00" },
-            { day: "thursday", hours: "00:00-00:00" },
-            { day: "friday", hours: "00:00-00:00" },
-            { day: "saturday", hours: "00:00-00:00" },
-            { day: "sunday", hours: "00:00-00:00" }
-        ]),
+        .default(defaultOpeningHours),
 });
 
 export type DietaryRestrictionType = z.infer<typeof DietaryRestrictionSchema>;

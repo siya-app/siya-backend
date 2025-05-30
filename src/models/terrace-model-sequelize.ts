@@ -1,7 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../config/sequelize-config.js';
-import { validFoodCategoryTags, validEmotionalTags, validCoverType, validPlacementTypes } from './zod/customTerrace-schema.js';
+import { validFoodCategoryTags, validEmotionalTags, validCoverTypes, validPlacementTypes, validDietaryRestrictionTypes } from './zod/customTerrace-schema.js';
 import { tagValidator } from '../utils/tagValidator.js';
+import defaultOpeningHours from '../utils/defaultOpeningHours.js';
 //TODO find default images!!
 
 class Terrace extends Model {
@@ -193,13 +194,19 @@ Terrace.init({
         defaultValue: [],
         validate: {
             isValidCoverType(value: any) {
-                tagValidator(value, validCoverType);
+                tagValidator(value, validCoverTypes);
             }
         }
     },
     dietary_restrictions: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: true,
+        defaultValue: [],
+        validate: {
+            isValidDietaryRestrictionsType(value: any) {
+                tagValidator(value, validDietaryRestrictionTypes);
+            }
+        }
     },
     profile_pic: {
         type: DataTypes.STRING,
@@ -215,15 +222,7 @@ Terrace.init({
     opening_hours: {
         type: DataTypes.JSON,
         allowNull: false,
-        defaultValue: [
-            { day: "monday", hours: "00:00-00:00" },
-            { day: "tuesday", hours: "00:00-00:00" },
-            { day: "wednesday", hours: "00:00-00:00" },
-            { day: "thursday", hours: "00:00-00:00" },
-            { day: "friday", hours: "00:00-00:00" },
-            { day: "saturday", hours: "00:00-00:00" },
-            { day: "sunday", hours: "00:00-00:00" }
-        ],
+        defaultValue: defaultOpeningHours,
         validate: {
             isValidHours(value: any) {
                 if (!Array.isArray(value)) throw new Error('Must be an array');
