@@ -1,8 +1,12 @@
 import { z } from "zod";
+import { typeValidator } from "../../utils/typeValidator.js";
+import { tagValidator } from "../../utils/tagValidator.js";
 
 export const DietaryRestrictionSchema = z.enum([
     'Vegetarian', 'Vegan', 'NonVegetarian', 'GlutenFree'
 ]);
+
+export const validDietaryRestrictionTypes = typeValidator(DietaryRestrictionSchema);
 
 export const FoodCategorySchema = z.union([
     z.literal('Asian'),
@@ -31,6 +35,8 @@ export const FoodCategorySchema = z.union([
     z.null()
 ]);
 
+export const validFoodCategoryTags = typeValidator(FoodCategorySchema);
+
 export const PlacementTypeSchema = z.union([
     z.literal('Garden'),
     z.literal('Park'),
@@ -41,6 +47,8 @@ export const PlacementTypeSchema = z.union([
     z.literal('Seaside'),
     z.null()
 ]);
+
+export const validPlacementTypes = typeValidator(PlacementTypeSchema)
 
 export const EmotionalTagsSchema = z.union([
     z.literal('Relaxed'),
@@ -59,6 +67,8 @@ export const EmotionalTagsSchema = z.union([
     z.null()
 ]);
 
+export const validEmotionalTags = typeValidator(EmotionalTagsSchema);
+
 export const CoverTypeSchema = z.union([
     z.literal('None'),
     z.literal('Umbrella'),
@@ -68,6 +78,9 @@ export const CoverTypeSchema = z.union([
     z.literal('Ceiling'),
     z.null()
 ]);
+
+export const validCoverTypes = typeValidator(CoverTypeSchema);
+
 
 export const UserRatingSchema = z.union([
     z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5),
@@ -87,6 +100,27 @@ export const PromoSchema = z.object({
     price: z.number()
 });
 
+export const BusinessSchema = z.object({
+    id: z.string(),
+    business_name: z.string(),
+    phone_num: z.string().optional(),
+    email: z.string().optional(),
+    profile_pic: z.record(z.any()).optional(),
+    is_verified: z.boolean(),
+});
+
+const DaySchema = z.object({
+    day: z.enum([
+        "monday", "tuesday", "wednesday",
+        "thursday", "friday", "saturday", "sunday"
+    ]),
+    hours: z.string()
+        .regex(/^\d{2}:\d{2}-\d{2}:\d{2}$/, {
+            message: "Hours must be in format 'HH:MM-HH:MM' (e.g., '09:00-17:00')",
+        })
+        .default("00:00-00:00"),
+});
+
 export const CustomTerraceSchema = z.object({
     id: z.string(),
     business_name: z.string(),
@@ -101,7 +135,6 @@ export const CustomTerraceSchema = z.object({
     district_code: z.number(),
     neighbourhood_name: z.string(),
     neighbourhood_code: z.number(),
-    opening_hours: z.string().optional(),
     tables: z.number(),
     seats: z.number(),
     latitude: z.string(),
@@ -118,21 +151,28 @@ export const CustomTerraceSchema = z.object({
     placement_type: z.array(PlacementTypeSchema).optional(),
     emotional_tags: z.array(EmotionalTagsSchema).optional(),
     cover_type: CoverTypeSchema.optional(),
-    profile_pic: z.record(z.any()).optional(),
-    current_promos: z.array(PromoSchema).optional(),
-    terrace_reviews: z.array(ReviewSchema).optional(),
-});
-
-export const BusinessSchema = z.object({
-    id: z.string(),
-    business_name: z.string(),
-    phone_num: z.string().optional(),
-    email: z.string().optional(),
-    profile_pic: z.record(z.any()).optional(),
+    profile_pic: z.string().optional(),
+    has_promos: z.boolean(),
+    reservation_fee: z.number(),
+    is_premium: z.boolean(),
     is_verified: z.boolean(),
-    terraces: z.array(CustomTerraceSchema).optional()
+    instagram_account: z.string(),
+    opening_hours: z.array(DaySchema)
+        .length(7)
+        .refine(
+            (days) => new Set(days.map(day => day.day)).size === 7,
+            { message: "All 7 unique days must be provided" }
+        )
+        .default([
+            { day: "monday", hours: "00:00-00:00" },
+            { day: "tuesday", hours: "00:00-00:00" },
+            { day: "wednesday", hours: "00:00-00:00" },
+            { day: "thursday", hours: "00:00-00:00" },
+            { day: "friday", hours: "00:00-00:00" },
+            { day: "saturday", hours: "00:00-00:00" },
+            { day: "sunday", hours: "00:00-00:00" }
+        ]),
 });
-
 
 export type DietaryRestrictionType = z.infer<typeof DietaryRestrictionSchema>;
 export type FoodCategoryType = z.infer<typeof FoodCategorySchema>;

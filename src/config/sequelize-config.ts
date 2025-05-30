@@ -9,13 +9,17 @@ export const sequelize = new Sequelize(
     process.env.MYSQL_PASSWORD,
     {
         host: process.env.MYSQL_HOST || 'localhost',
+        port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3306,
         dialect: 'mysql',
     }
 )
 
-try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
+async function testConnection() {
+
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
 }

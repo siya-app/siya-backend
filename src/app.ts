@@ -3,7 +3,7 @@ console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 import cors from 'cors';
 import { createCustomValidatedTerrace } from './controllers/terrace.validator.js';
-import terraceRoutes from './routes/terrace.routes';
+import terraceRoutes from './routes/terraces.router.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -38,7 +38,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form data
 
 // api routes here
-
 app.use("/terraces", terraceRoutes);
 
 // middleware -->

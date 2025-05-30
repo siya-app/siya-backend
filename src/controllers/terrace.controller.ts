@@ -2,6 +2,7 @@ import Terrace from '../models/terrace-model-sequelize.js';
 import { Router, Request, Response } from 'express';
 import { CustomTerraceType } from '../models/zod/customTerrace-schema.js';
 
+// http://localhost:8080/terraces
 // GET ALL items
 export const getAllTerraces = async (req: Request, res: Response) => {
     try {
@@ -15,6 +16,7 @@ export const getAllTerraces = async (req: Request, res: Response) => {
     }
 };
 
+// http://localhost:8080/terraces/id
 // GET items/:id
 export const getTerraceById = async (req: Request, res: Response) => {
     const terraceID = req.params.id;
@@ -38,16 +40,18 @@ export const getTerraceById = async (req: Request, res: Response) => {
     }
 };
 
+// http://localhost:8080/terraces
 // POST items
 export const createNewTerrace = async(req: Request, res: Response) => {
     const terraceData: CustomTerraceType = req.body;
+    console.log("💡 terraceData:", terraceData);
 
     if (!terraceData || !terraceData.id) {
         return res.status(400).json({ error: "Invalid or inexistent terrace data" })
     }
 
     try {
-        const createdTerrace = await Terrace.create({ terraceData });
+        const createdTerrace = await Terrace.create(terraceData);
         res.status(201).json(createdTerrace);
 
     } catch (error) {
@@ -56,6 +60,7 @@ export const createNewTerrace = async(req: Request, res: Response) => {
     }
 };
 
+// http://localhost:8080/terraces/id
 // PUT items/:id
 export const updateTerrace = async (req: Request, res: Response) => {
     const terraceID = parseInt(req.params.id, 10);
@@ -75,6 +80,7 @@ export const updateTerrace = async (req: Request, res: Response) => {
     }
 };
 
+// http://localhost:8080/terraces
 // DELETE items/:id
 export const deleteTerrace = async (req: Request, res: Response) => {
     const terraceID = parseInt(req.params.id, 10);
