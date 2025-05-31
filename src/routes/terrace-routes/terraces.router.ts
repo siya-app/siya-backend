@@ -5,7 +5,7 @@ import {
     createNewTerrace,
     updateTerrace,
     deleteTerrace,
-} from "../controllers/terrace.controller.js";
+} from "../../controllers/terrace-controllers/terrace.controller.js";
 
 const router = Router();
 

@@ -1,6 +1,6 @@
-import { createApiInstance } from '../config/api-connection-config.js'
-import { axiosRequest } from '../config/api-connection-service.js';
-import { ENV } from '../config/env.js';
+import { createApiInstance } from '../../config/api-connection-config.js'
+import { axiosRequest } from '../../config/api-connection-service.js';
+import { ENV } from '../../config/env.js';
 
 type PaginatedResult<T> = {
     data: T[];

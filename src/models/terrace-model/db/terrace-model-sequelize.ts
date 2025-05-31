@@ -1,8 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../config/sequelize-config.js';
-import { validFoodCategoryTags, validEmotionalTags, validCoverTypes, validPlacementTypes, validDietaryRestrictionTypes } from './zod/customTerrace-schema.js';
-import { tagValidator } from '../utils/tagValidator.js';
-import defaultOpeningHours from '../utils/defaultOpeningHours.js';
+import { sequelize } from '../../../config/sequelize-config.js';
+import { validFoodCategoryTags, validEmotionalTags, validCoverTypes, validPlacementTypes, validDietaryRestrictionTypes } from '../zod/customTerrace-schema.js';
+import { tagValidator } from '../../../utils/terrace-utils/tagValidator.js';
+import {defaultOpeningHours} from '../../../utils/terrace-utils/defaultOpeningHours.js';
 //TODO find default images!!
 
 class Terrace extends Model {

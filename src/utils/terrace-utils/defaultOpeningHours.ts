@@ -1,4 +1,4 @@
-const defaultOpeningHours: { day: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday"; hours: string }[] = [
+export const defaultOpeningHours: { day: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday"; hours: string }[] = [
     { day: "monday", hours: "00:00-00:00" },
     { day: "tuesday", hours: "00:00-00:00" },
     { day: "wednesday", hours: "00:00-00:00" },
@@ -7,4 +7,3 @@ const defaultOpeningHours: { day: "monday" | "tuesday" | "wednesday" | "thursday
     { day: "saturday", hours: "00:00-00:00" },
     { day: "sunday", hours: "00:00-00:00" },
 ];
-export default defaultOpeningHours;

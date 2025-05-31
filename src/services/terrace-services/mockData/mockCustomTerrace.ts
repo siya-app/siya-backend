@@ -1,4 +1,4 @@
-import { CustomTerraceType } from "../../models/zod/customTerrace-schema.js";
+import { CustomTerraceType } from "../../models/terrace-model/zod/customTerrace-schema.js";
 
 export const mockCustomTerrace: CustomTerraceType = {
     id: "biz-12345",

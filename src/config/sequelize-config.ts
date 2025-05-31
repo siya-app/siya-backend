@@ -9,7 +9,7 @@ export const sequelize = new Sequelize(
     process.env.MYSQL_PASSWORD,
     {
         host: process.env.MYSQL_HOST || 'localhost',
-        port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3306,
+        port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3000,
         dialect: 'mysql',
     }
 )
@@ -23,3 +23,5 @@ async function testConnection() {
         console.error('Unable to connect to the database:', error);
     }
 }
+
+testConnection();

@@ -1,10 +1,10 @@
-import { fetchAllDataFromApis } from "../services/all.data.service.js";
+import { fetchAllDataFromApis } from "../../services/terrace-services/all.data.service.js";
 import { matchByCoords } from "./validators/coordsValidator.js";
 import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
 import { createCustomTerrace } from "./validators/createCustomTerrace.js";
-import type { TerraceApiType } from "../models/zod/terrace-schema.js";
-import type { BusinessApiType } from "../models/zod/business-schema.js";
-import Terrace from "../models/terrace-model-sequelize.js";
+import type { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js";
+import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
+import Terrace from "../../models/db/terrace-model-sequelize.js";
 
 export async function createCustomValidatedTerrace() {
 

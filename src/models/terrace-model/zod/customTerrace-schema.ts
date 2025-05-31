@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { typeValidator } from "../../utils/typeValidator.js";
-import { tagValidator } from "../../utils/tagValidator.js";
-import { defaultOpeningHours } from "../../utils/defaultOpeningHours.js";
+import { typeValidator } from "../../../utils/terrace-utils/typeValidator.js";
+import { tagValidator } from "../../../utils/terrace-utils/tagValidator.js";
+import { defaultOpeningHours } from "../../../utils/terrace-utils/defaultOpeningHours.js";
 
 export const DietaryRestrictionSchema = z.enum([
     'Vegetarian', 'Vegan', 'NonVegetarian', 'GlutenFree'
 ]);
 
-export const validDietaryRestrictionTypes = typeValidator(DietaryRestrictionSchema);
+export const validDietaryRestrictionTypes = ['Vegetarian', 'Vegan', 'NonVegetarian', 'GlutenFree']
 
 export const FoodCategorySchema = z.union([
     z.literal('Asian'),

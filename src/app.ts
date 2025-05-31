@@ -1,9 +1,10 @@
 
 console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
+// import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
-import { createCustomValidatedTerrace } from './controllers/terrace.validator.js';
-import terraceRoutes from './routes/terraces.router.js';
+import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
+import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -17,6 +18,27 @@ process.on('uncaughtException', (err) => {
     console.error('CRASH:', err);
     process.exit(1);
 });
+
+//!
+//! DO NOT TOUCH or UNCOMMENT
+// this function ERASES everything from the database, useful by the moment
+// for testing objects, will delete it asap
+// async function start() {
+//     try {
+//         await sequelize.sync({ force: true }); // force: true drops & recreates tables
+//         console.log("Database synced (tables recreated).");
+
+//         app.listen(port, () => {
+//             console.log(`Server listening on port ${port}`);
+//         });
+//     } catch (error) {
+//         console.error("Error syncing database:", error);
+//     }
+// }
+
+// start();
+//!
+//!
 
 const app = express();
 const port = process.env.PORT || 8080;

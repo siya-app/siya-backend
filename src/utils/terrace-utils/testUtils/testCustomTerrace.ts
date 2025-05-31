@@ -1,4 +1,4 @@
-import defaultOpeningHours from '../defaultOpeningHours.js';
+import {defaultOpeningHours} from '../defaultOpeningHours.js';
 
 const testCustomTerrace = {
     id: "test-001",
