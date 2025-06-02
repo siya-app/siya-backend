@@ -1,8 +1,5 @@
-import { BusinessApiType } from "../../../models/terrace-model/zod/business-schema.js";
-import { TerraceApiType } from "../../../models/terrace-model/zod/terrace-schema.js";
-import {defaultOpeningHours} from "../../../utils/terrace-utils/defaultOpeningHours.js";
-
-export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Partial<BusinessApiType>) {
+import { defaultOpeningHours } from "../../../utils/terrace-utils/defaultOpeningHours.js";
+export function createCustomTerrace(terrace, biz) {
     return {
         id: biz.ID_Global,
         business_name: biz.Nom_CComercial,
@@ -42,7 +39,6 @@ export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Parti
         opening_hours: defaultOpeningHours
     };
 }
-
 // {
 //     "id": "test-001",
 //     "business_name": "Terrassa Guapa",
@@ -70,3 +66,4 @@ export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Parti
 //     "has_disabled_acces": true,
 //     "has_kitchen": false
 //   }
+//# sourceMappingURL=createCustomTerrace.js.map

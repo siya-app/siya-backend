@@ -1,7 +1,5 @@
-import { CustomTerraceType } from "../../../models/terrace-model/zod/customTerrace-schema.js";
 import { defaultOpeningHours } from "../../../utils/terrace-utils/defaultOpeningHours.js";
-
-export const mockCustomTerrace: CustomTerraceType = {
+export const mockCustomTerrace = {
     id: "biz-12345",
     business_name: "Sunset Café",
     cadastro_ref: "REF-67890",
@@ -31,8 +29,8 @@ export const mockCustomTerrace: CustomTerraceType = {
     is_premium: false,
     is_verified: false,
     instagram_account: ''
-}
-
+};
 export function mockCreateCustomTerrace() {
     return mockCustomTerrace;
 }
+//# sourceMappingURL=mockCustomTerrace.js.map

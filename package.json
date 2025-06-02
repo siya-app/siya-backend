@@ -1,5 +1,5 @@
 {
-  "name": "apperitiu-bcn-node-sql",
+  "name": "siya-backend",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/OhMyLaia/apperitiu-bcn-node-sql.git"
   },
-  "author": "ohmylaia",
+  "author": "siya",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/OhMyLaia/apperitiu-bcn-node-sql/issues"
@@ -22,13 +22,16 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+    "@types/body-parser": "^1.19.5",
+    "@types/compression": "^1.8.0",
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.18",
-    "@types/express": "^4.17.1",
+    "@types/express": "^4.17.22",
     "@types/node": "^22.15.21",
     "@types/validator": "^13.15.1",
     "eslint": "^9.27.0",
     "globals": "^16.1.0",
-    "nodemon": "^3.1.0",
+    "nodemon": "^3.1.10",
     "tsx": "^4.9.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.32.1",
@@ -36,6 +39,9 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "body-parser": "^2.2.0",
+    "compression": "^1.8.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
@@ -44,6 +50,6 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.7",
     "sequelize-typescript": "^2.1.6",
-    "zod": "^3.25.23"
+    "zod": "^3.25.48"
   }
 }
