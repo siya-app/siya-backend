@@ -1,6 +1,6 @@
-import Terrace from '../models/terrace-model-sequelize.js';
+import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
 import { Router, Request, Response } from 'express';
-import { CustomTerraceType } from '../models/zod/customTerrace-schema.js';
+import { CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
 
 // http://localhost:8080/terraces
 // GET ALL items

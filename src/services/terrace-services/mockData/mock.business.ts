@@ -1,4 +1,4 @@
-import { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
+import { BusinessApiType } from "../../../models/terrace-model/zod/business-schema.js";
 
 export const businesses: Partial<BusinessApiType>[] = [
         {

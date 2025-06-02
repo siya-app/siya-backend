@@ -1,4 +1,4 @@
-import { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js"
+import { TerraceApiType } from "../../../models/terrace-model/zod/terrace-schema.js"
 
 export const terraces: Partial<TerraceApiType>[] = [
     {
