@@ -137,10 +137,6 @@ Terrace.init({
         type: DataTypes.BOOLEAN,
         allowNull: true,
     },
-    has_promos: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
     reservation_fee: {
         type: DataTypes.FLOAT,
         allowNull: false,
@@ -150,7 +146,7 @@ Terrace.init({
         type: DataTypes.BOOLEAN,
         allowNull: false,
     },
-    is_verified: {
+    is_claimed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
     },
@@ -158,82 +154,14 @@ Terrace.init({
         type: DataTypes.STRING,
         allowNull: true,
     },
-    food_category: {
-        type: DataTypes.JSON,
+    website: {
+        type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: [],
-        validate: {
-            isValidFoodTags(value: any) {
-                tagValidator(value, validFoodCategoryTags)
-            }
-        }
-    },
-    placement_type: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-        validate: {
-            isValidPlacementType(value: any) {
-                tagValidator(value, validPlacementTypes)
-            }
-        }
-    },
-    emotional_tags: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-        validate: {
-            isValidEmotionalTags(value: any) {
-                tagValidator(value, validEmotionalTags);
-            }
-        }
-    },
-    cover_type: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-        validate: {
-            isValidCoverType(value: any) {
-                tagValidator(value, validCoverTypes);
-            }
-        }
-    },
-    dietary_restrictions: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-        validate: {
-            isValidDietaryRestrictionsType(value: any) {
-                tagValidator(value, validDietaryRestrictionTypes);
-            }
-        }
     },
     profile_pic: {
         type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: () => {
-            const defaultImages = [
-                "terrace1.jpg",
-                "terrace2.jpg",
-            ];
-            return defaultImages[Math.floor(Math.random() * defaultImages.length)];
-        },
-    },
-    opening_hours: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: defaultOpeningHours,
-        validate: {
-            isValidHours(value: any) {
-                if (!Array.isArray(value)) throw new Error('Must be an array');
-                if (value.length !== 7) throw new Error('Must have 7 days');
-                value.forEach(day => {
-                    if (!/^\d{2}:\d{2}-\d{2}:\d{2}$/.test(day.hours)) {
-                        throw new Error(`Invalid hours format for ${day.day}`);
-                    }
-                });
-            }
-        }
+        defaultValue: ''
     },
 },
     {
