@@ -52,16 +52,8 @@ Terrace.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    street_type: {
+    address: {
         type: DataTypes.STRING,
-        allowNull: false,
-    },
-    street_address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    door_address: {
-        type: DataTypes.INTEGER,
         allowNull: false,
     },
     activity_code: {
@@ -88,7 +80,7 @@ Terrace.init({
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    postal_code: {
+    zip_code: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
@@ -129,7 +121,7 @@ Terrace.init({
         type: DataTypes.BOOLEAN,
         allowNull: true,
     },
-    has_disabled_acces: {
+    has_disabled_access: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
     },
@@ -142,13 +134,10 @@ Terrace.init({
         allowNull: false,
         defaultValue: 0
     },
-    is_premium: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
     is_claimed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+        defaultValue: false
     },
     instagram_account: {
         type: DataTypes.STRING,
