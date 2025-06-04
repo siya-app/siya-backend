@@ -32,7 +32,7 @@ export async function fetchDataTerraces(): Promise<object[]> {
         const records = response?.result?.records;
         if (!records || records.length === 0) {
             console.log("❌ No terrace records found");
-            // return []
+            return [] // esto descomente
         }
 
         console.log("✅🍸 Received data from api terraces,", records.length, "total length:", totalLength);
