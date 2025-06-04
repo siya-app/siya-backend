@@ -2,7 +2,7 @@
 import { Router, Request, Response } from 'express';
 // import { CustomTerraceType } from '../models/zod/customTerrace-schema.js';
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
-import { CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
+import { CustomTerraceSchema, CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
 
 
 // http://localhost:8080/terraces
@@ -15,7 +15,7 @@ export const getAllTerraces = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.log(`Error fetching terraces: error ${error}`);
-        res.status(500).json({error: "Error fetching terraces"})
+        res.status(500).json({ error: "Error fetching terraces" })
     }
 };
 
@@ -30,7 +30,7 @@ export const getTerraceById = async (req: Request, res: Response) => {
     }
 
     try {
-        const terrace = await Terrace.findOne( { where: { id: terraceID } });
+        const terrace = await Terrace.findOne({ where: { id: terraceID } });
 
         if (!terrace) {
             return res.status(404).json({ error: "Terrace ID- not found" });
@@ -39,27 +39,48 @@ export const getTerraceById = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.log(`Error fetching terrace ID-${terraceID}: error ${error}`);
-        res.status(500).json({error: "Error fetching terrace"})
+        res.status(500).json({ error: "Error fetching terrace" })
     }
 };
 
 // http://localhost:8080/terraces
 // POST items
-export const createNewTerrace = async(req: Request, res: Response) => {
-    const terraceData: CustomTerraceType = req.body;
-    console.log("💡 terraceData:", terraceData);
+// export const createNewTerrace = async(req: Request, res: Response) => {
+//     const terraceData: CustomTerraceType = req.body;
+//     console.log("💡 terraceData:", terraceData);
+//     console.log("🧪 Received data:", req.body);
 
-    if (!terraceData || !terraceData.id) {
-        return res.status(400).json({ error: "Invalid or inexistent terrace data" })
-    }
+//     if (!terraceData) {
+//         return res.status(400).json({ error: "Invalid or inexistent terrace data" })
+//     }
 
+//     try {
+//         const createdTerrace = await Terrace.create(terraceData);
+//         res.status(201).json(createdTerrace);
+
+//     } catch (error) {
+//         console.error(`Error adding terrace: error ${error}`);
+//         res.status(500).json({ error: "Error adding terrace" })
+//     }
+// };
+
+export const createNewTerrace = async (req: Request, res: Response) => {
     try {
-        const createdTerrace = await Terrace.create(terraceData);
-        res.status(201).json(createdTerrace);
+        const terraceData = CustomTerraceSchema.parse(req.body); // ✅ Validar con Zod
+        console.log("💡 terraceData validated:", terraceData);
 
-    } catch (error) {
-        console.error(`Error adding terrace: error ${error}`);
-        res.status(500).json({ error: "Error adding terrace" })
+        const createdTerrace = await Terrace.create(terraceData); // ✅ Crear en la DB
+        return res.status(201).json(createdTerrace);
+
+    } catch (error: any) {
+        if (error.name === "ZodError") {
+            console.log("❌ Zod validation failed:", error.errors);
+            console.error("🔥 FULL ERROR:", error);
+            return res.status(400).json({ error: "Validation failed", details: error.errors });
+        }
+
+        console.error(`❌ Error adding terrace:`, error);
+        return res.status(500).json({ error: "Error adding terrace" });
     }
 };
 
@@ -70,11 +91,11 @@ export const updateTerrace = async (req: Request, res: Response) => {
     const { terrace } = req.body;
 
     if (typeof terrace !== "string" || terrace.trim() === "") {
-        return res.status(400).json({err: "Invalid or inexistent terrace data"})
+        return res.status(400).json({ err: "Invalid or inexistent terrace data" })
     }
 
     try {
-        await Terrace.update( { terrace }, { where: { id: terraceID } });
+        await Terrace.update({ terrace }, { where: { id: terraceID } });
         res.sendStatus(200);
 
     } catch (error) {
@@ -93,7 +114,7 @@ export const deleteTerrace = async (req: Request, res: Response) => {
     }
 
     try {
-        await Terrace.destroy({ where: { id: terraceID }});
+        await Terrace.destroy({ where: { id: terraceID } });
         res.sendStatus(200);
 
     } catch (error) {
