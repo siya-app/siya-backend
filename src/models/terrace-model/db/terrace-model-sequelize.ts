@@ -137,24 +137,29 @@ Terrace.init({
         type: DataTypes.BOOLEAN,
         allowNull: true,
     },
-    has_promos: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
+    // has_promos: {
+    //     type: DataTypes.BOOLEAN,
+    //     allowNull: false,
+    // },
     reservation_fee: {
         type: DataTypes.FLOAT,
         allowNull: false,
         defaultValue: 0
     },
-    is_premium: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
-    is_verified: {
+    // is_premium: {
+    //     type: DataTypes.BOOLEAN,
+    //     allowNull: false,
+    // },
+    //!ha cambiado
+    is_claimed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
     },
     instagram_account: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    website: {
         type: DataTypes.STRING,
         allowNull: true,
     },
@@ -178,16 +183,16 @@ Terrace.init({
             }
         }
     },
-    emotional_tags: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-        validate: {
-            isValidEmotionalTags(value: any) {
-                tagValidator(value, validEmotionalTags);
-            }
-        }
-    },
+    // emotional_tags: {
+    //     type: DataTypes.JSON,
+    //     allowNull: true,
+    //     defaultValue: [],
+    //     validate: {
+    //         isValidEmotionalTags(value: any) {
+    //             tagValidator(value, validEmotionalTags);
+    //         }
+    //     }
+    // },
     cover_type: {
         type: DataTypes.JSON,
         allowNull: true,
@@ -219,6 +224,7 @@ Terrace.init({
             return defaultImages[Math.floor(Math.random() * defaultImages.length)];
         },
     },
+    // buscar ejemplos de modelos relacionales de horarios
     opening_hours: {
         type: DataTypes.JSON,
         allowNull: false,
