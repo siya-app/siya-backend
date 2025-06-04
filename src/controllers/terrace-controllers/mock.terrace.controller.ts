@@ -13,7 +13,8 @@ export async function createCustomValidatedTerrace() {
     let customTerraces: any[] = [];
     const unmatchedTerraces: TerraceApiType[] = [];
 
-    for (const terrace of terraces) {
+    for (let i = 0 ; i < terraces.length ; i++) {
+        const terrace = terraces[i];
 
         let matchingRestaurants = matchByCoords(terrace, businesses);
 
