@@ -3,8 +3,12 @@ console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 // import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
+import morgan from 'morgan'
+
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
+import userRoutes from './routes/user-routes/user.routes.js'
+import { sequelize } from './config/sequelize-config.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -42,6 +46,7 @@ process.on('uncaughtException', (err) => {
 
 const app = express();
 const port = process.env.PORT || 8080;
+app.use(morgan('dev'))
 
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -61,6 +66,7 @@ app.use(express.urlencoded({ extended: true })); // For form data
 
 // api routes here
 app.use("/terraces", terraceRoutes);
+app.use('/api',userRoutes)
 
 // middleware -->
 // app.use(notFound);

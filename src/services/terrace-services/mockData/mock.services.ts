@@ -1,5 +1,7 @@
-import * as {businesses } from './mock.business.js'
-import 
+// import * as {businesses } from './mock.business.js'
+import { businesses } from "./mock.business.js"
+
+
 
 function fetchMockData() {
 

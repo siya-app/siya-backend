@@ -1,4 +1,5 @@
-import { CustomTerraceType } from "../../models/terrace-model/zod/customTerrace-schema.js";
+// import { CustomTerraceType } from "../../models/terrace-model/zod/customTerrace-schema.js";
+import { CustomTerraceType } from "../../../models/terrace-model/zod/customTerrace-schema.js";
 
 export const mockCustomTerrace: CustomTerraceType = {
     id: "biz-12345",
@@ -14,7 +15,7 @@ export const mockCustomTerrace: CustomTerraceType = {
     district_code: 1,
     neighbourhood_name: "Arts District",
     neighbourhood_code: 12,
-    opening_hours: undefined,
+    opening_hours: [],
     tables: 10,
     seats: 40,
     latitude: String(41.3851),
@@ -24,7 +25,12 @@ export const mockCustomTerrace: CustomTerraceType = {
     has_wifi: undefined,
     pet_friendly: undefined,
     can_smoke: undefined,
-    has_kitchen: undefined
+    has_kitchen: undefined,
+    has_promos: false,
+    reservation_fee: 0,
+    is_premium: false,
+    is_verified: false,
+    instagram_account: ""
 }
 
 export function mockCreateCustomTerrace() {

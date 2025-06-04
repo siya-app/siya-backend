@@ -1,5 +1,8 @@
-import type { BusinessApiType } from "../../models/zod/business-schema.js";
-import { TerraceApiType } from "../../models/zod/terrace-schema.js";
+// import type { BusinessApiType } from "../../models/zod/business-schema.js";
+// import { TerraceApiType } from "../../models/zod/terrace-schema.js";
+import type { BusinessApiType } from "../../../models/terrace-model/zod/business-schema.js";
+import { TerraceApiType } from "../../../models/terrace-model/zod/terrace-schema.js";
+
 
 export function matchByCoords(
     terrace: TerraceApiType,
