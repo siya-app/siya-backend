@@ -1,6 +1,7 @@
 import { Model, DataTypes, DateDataType } from "sequelize";
 import { sequelize } from "../../config/sequelize-config.js";
 import User from "../user-model/user.model.js";
+import Terrace from "../terrace-model/db/terrace-model-sequelize.js";
 
 class Booking extends Model{
     public id!:string;
@@ -12,6 +13,7 @@ class Booking extends Model{
     public has_shown!:boolean;
     public booking_price!:number
     public user_id!:string
+    public terrace_id!: string;
 }
 
 Booking.init(
@@ -59,6 +61,14 @@ Booking.init(
                 model:User,
                 key:'id'
             },
+        },
+        terrace_id:{
+            type:DataTypes.UUID,
+            allowNull:false,
+            references:{
+                model:Terrace,
+                key:'id'
+            }
         }
         
 
@@ -79,9 +89,18 @@ Booking.belongsTo(User,{
     targetKey:'id'
 })
 
+Terrace.hasMany(Booking,{
+    foreignKey:'terrace_id',
+    sourceKey:'id'
+})
+Booking.belongsTo(Terrace,{
+    foreignKey:'terrace_id',
+    targetKey:'id'
+})
+
 export default Booking
 
-Booking.beforeCreate('setBookingPrice',(booking, options) => {
+Booking.beforeCreate('setBookingPrice',(booking) => {
   booking.booking_price = booking.party_length * 1; 
 });
   // cata de 1 euro por persona, el before create me lo sugiere (method) Model<TModelAttributes extends {} = any, TCreationAttributes extends {} = TModelAttributes>.beforeCreate<M extends Model>(this: ModelStatic<M>, name: string, fn: (instance: M, options: CreateOptions<Attributes<M>>) => HookReturn): void (+1 overload)
