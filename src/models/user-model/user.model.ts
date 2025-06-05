@@ -7,7 +7,7 @@ class User extends Model {
   public email!: string;
   public name!: string;
   public age!: number;
-   public readonly createdAt!: Date;
+  public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
@@ -27,15 +27,15 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    age:{
-        type:DataTypes.INTEGER,
-        allowNull:false
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     }
   },
   {
     sequelize,
     tableName: 'users',
-    timestamps: true 
+    timestamps: true
   }
 );
 

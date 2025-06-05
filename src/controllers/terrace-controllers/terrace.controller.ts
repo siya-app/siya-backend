@@ -66,10 +66,10 @@ export const getTerraceById = async (req: Request, res: Response) => {
 
 export const createNewTerrace = async (req: Request, res: Response) => {
     try {
-        const terraceData = CustomTerraceSchema.parse(req.body); // ✅ Validar con Zod
+        const terraceData = CustomTerraceSchema.parse(req.body);
         console.log("💡 terraceData validated:", terraceData);
 
-        const createdTerrace = await Terrace.create(terraceData); // ✅ Crear en la DB
+        const createdTerrace = await Terrace.create(terraceData);
         return res.status(201).json(createdTerrace);
 
     } catch (error: any) {

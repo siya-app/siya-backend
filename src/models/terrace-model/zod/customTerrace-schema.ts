@@ -110,7 +110,7 @@ export const BusinessSchema = z.object({
 });
 
 export const CustomTerraceSchema = z.object({
-    id: z.string(),
+    // id: z.string().uuid().optional(),
     business_name: z.string(),
     cadastro_ref: z.string(),
     address: z.string(),
