@@ -13,7 +13,8 @@ export async function createCustomValidatedTerrace() {
     let customTerraces: any[] = [];
     const unmatchedTerraces: TerraceApiType[] = [];
 
-    for (const terrace of terraces) {
+    for (let i = 0 ; i < terraces.length ; i++) {
+        const terrace = terraces[i];
 
         let matchingRestaurants = matchByCoords(terrace, businesses);
 
@@ -36,7 +37,8 @@ export async function createCustomValidatedTerrace() {
             if (!validMatches || validMatches.length !== 1) {
                 unmatchedTerraces.push(terrace);
             } else {
-                const custom = createCustomTerrace(terrace, validMatches[terrace]);
+                // const custom = createCustomTerrace(terrace, validMatches[terrace]); no es correcto con i, hay que darle una vuelta, pero sino da error
+                const custom = createCustomTerrace(terrace, validMatches[i]);
                 customTerraces.push(custom);
             }
             

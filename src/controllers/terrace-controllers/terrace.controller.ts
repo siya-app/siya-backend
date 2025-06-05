@@ -2,7 +2,7 @@
 import { Router, Request, Response } from 'express';
 // import { CustomTerraceType } from '../models/zod/customTerrace-schema.js';
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
-import { CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
+import { CustomTerraceSchema, CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
 
 
 // http://localhost:8080/terraces
@@ -13,9 +13,15 @@ export const getAllTerraces = async (req: Request, res: Response) => {
         res.json(terraces);
         res.status(200);
 
-    } catch (error) {
+    } catch (error: any) {
         console.log(`Error fetching terraces: error ${error}`);
-        res.status(500).json({error: "Error fetching terraces"})
+
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error fetching terraces", details: error.errors })
+        }
+
+        console.error(`❌ Error fetching terraces:`, error);
+        return res.status(500).json({ error: "Error fetching terraces" });
     }
 };
 
@@ -30,74 +36,182 @@ export const getTerraceById = async (req: Request, res: Response) => {
     }
 
     try {
-        const terrace = await Terrace.findOne( { where: { id: terraceID } });
+        const terrace = await Terrace.findByPk(terraceID);
+        // const terrace = await Terrace.findOne({ where: { id: terraceID } });
 
         if (!terrace) {
             return res.status(404).json({ error: "Terrace ID- not found" });
         }
         res.status(200).json(terrace);
 
-    } catch (error) {
+    } catch (error: any) {
         console.log(`Error fetching terrace ID-${terraceID}: error ${error}`);
-        res.status(500).json({error: "Error fetching terrace"})
+
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error fetching terrace", details: error.errors })
+        }
+
+        console.error(`❌ Error fetching terrace:`, error);
+        return res.status(500).json({ error: "Error fetching terrace" });
     }
 };
 
 // http://localhost:8080/terraces
 // POST items
-export const createNewTerrace = async(req: Request, res: Response) => {
-    const terraceData: CustomTerraceType = req.body;
-    console.log("💡 terraceData:", terraceData);
 
-    if (!terraceData || !terraceData.id) {
-        return res.status(400).json({ error: "Invalid or inexistent terrace data" })
-    }
+export const createNewTerrace = async (req: Request, res: Response) => {
 
     try {
-        const createdTerrace = await Terrace.create(terraceData);
-        res.status(201).json(createdTerrace);
+        const terraceData = CustomTerraceSchema.parse(req.body);
 
-    } catch (error) {
-        console.error(`Error adding terrace: error ${error}`);
-        res.status(500).json({ error: "Error adding terrace" })
+        if (!terraceData) {
+            return res.status(204).json({ error: "Invalid or inexistent terrace" });
+        }
+        console.log("💡 terraceData validated:", terraceData);
+
+        const createdTerrace = await Terrace.create(terraceData);
+        return res.status(201).json(createdTerrace);
+
+    } catch (error: any) {
+        if (error.name === "ZodError") {
+            console.error("🔥 FULL ERROR:", error);
+            return res.status(400).json({ error: "❌ Validation failed", details: error.errors });
+        }
+
+        console.error(`❌ Error adding terrace:`, error);
+        return res.status(500).json({ error: "Error adding terrace" });
     }
 };
 
 // http://localhost:8080/terraces/id
 // PUT items/:id
-export const updateTerrace = async (req: Request, res: Response) => {
-    const terraceID = parseInt(req.params.id, 10);
-    const { terrace } = req.body;
+// export const updateTerrace = async (req: Request, res: Response) => {
+//     const terraceID = req.params.id;
+//     const terraceData = req.body;
+//     console.log("📦 Data received to update:", terraceData);
+//     console.warn(terraceID, "terraceID")
+    
+//     if (!terraceID) {
+//         return res.status(400).json({ err: "Invalid or inexistent terrace data" });
+//     }
 
-    if (typeof terrace !== "string" || terrace.trim() === "") {
-        return res.status(400).json({err: "Invalid or inexistent terrace data"})
+//     try {
+//         await Terrace.update(terraceData, { where: { id: terraceID } });
+//         // if (updatedTerrace === 0) {
+//         //     return res.status(404).json({ error: "Terrace not found" });
+//         // }
+//         res.sendStatus(200);
+
+//     } catch (error: any) {
+//         console.error(`Error updating terrace ID-${terraceID}: ${error}`);
+//         if (error.name === 'ZodError') {
+//             return res.status(500).json({ error: "❌ Error updating terrace", details: error.errors });
+//         }
+
+//         console.error(`❌ Error adding terrace:`, error);
+//         return res.status(500).json({ error: "Error updating terrace" });
+//     }
+// };
+
+export const updateTerrace = async (req: Request, res: Response) => {
+    const terraceID = req.params.id;
+    const updateData = req.body; // Assuming the update data is sent in the request body
+
+    if (!terraceID) {
+        return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
+    }
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+        return res.status(400).json({ error: "No update data provided" });
     }
 
     try {
-        await Terrace.update( { terrace }, { where: { id: terraceID } });
-        res.sendStatus(200);
+        const [updatedRows] = await Terrace.update(updateData, { 
+            where: { id: terraceID } 
+        });
 
-    } catch (error) {
+        if (updatedRows === 0) {
+            return res.status(404).json({ error: "Terrace not found or no changes made" });
+        }
+
+        res.status(200).json({ 
+            message: "Terrace updated successfully",
+            terraceID,
+            updatedFields: updateData
+        });
+
+    } catch (error: any) {
         console.error(`Error updating terrace ID-${terraceID}: ${error}`);
-        res.status(500).json({ error: "Error updating terrace" });
+
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ 
+                error: "❌ Error updating terrace", 
+                terraceID, 
+                details: error.errors
+            });
+        }
+        
+        console.error(`❌ Error updating terrace:`, error);
+        return res.status(500).json({ 
+            error: "Error updating terrace",
+            message: error.message 
+        });
     }
 };
 
+// export const updateTerrace = async (req: Request, res: Response) => {
+//     const terraceID = req.params.id;
+//     const terraceData = req.body;
+
+//     if (!terraceID) {
+//         return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
+//     }
+
+//     try {
+//         const terraceToUpdate = await Terrace.findByPk(terraceID);
+//         console.error(`terrace: ${terraceToUpdate}`);
+
+//         if (!terraceToUpdate) {
+//             return res.status(404).json({ error: "Terrace not found", terraceToUpdate });
+//         }
+
+//         await terraceToUpdate.update(terraceData);
+
+//         return res.status(200).json(terraceToUpdate);
+
+//     } catch (error: any) {
+//         console.error(`❌ Error updating terrace ID-${terraceID}:`, error);
+//         return res.status(500).json({ error: "Error updating terrace" });
+//     }
+// };
+
+// export const updateTerrace = async (req: Request, res: Response) => {
+//     const terraceID = req.params.id;
+//     res.status(200).json({message: `update test ${terraceID}`})
+// }
+
 // http://localhost:8080/terraces
 // DELETE items/:id
-export const deleteTerrace = async (req: Request, res: Response) => {
-    const terraceID = parseInt(req.params.id, 10);
 
-    if (isNaN(terraceID) || !terraceID) {
+
+export const deleteTerrace = async (req: Request, res: Response) => {
+    const terraceID = req.params.id;
+
+    if (!terraceID) {
         return res.status(400).json({ error: "Invalid or inexistent terrace ID" })
     }
 
     try {
-        await Terrace.destroy({ where: { id: terraceID }});
+        await Terrace.destroy({ where: { id: terraceID } });
         res.sendStatus(200);
 
-    } catch (error) {
+    } catch (error: any) {
         console.error(`Error deleting terrace ID-${terraceID}: ${error}`);
-        res.status(500).json({ error: "Error deleting terrace", terraceID })
+
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error deleting terrace", terraceID, details: error.errors});
+        }
+        console.error(`❌ Error adding terrace:`, error);
+        return res.status(500).json({ error: "Error deleting terrace" });
     }
 };
