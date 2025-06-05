@@ -1,5 +1,6 @@
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
 import { CustomTerraceSchema, CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
+import { Request, Response } from 'express';
 
 
 // http://localhost:8080/terraces
