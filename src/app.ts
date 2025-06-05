@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 
 app.use(cors({
     origin: 'http://localhost:5173', // Allow only your frontend // 5173 for vite app
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
     credentials: true // If cookies/auth headers needed!
     //TODO take a look at middleware headers auth
 }));
@@ -65,8 +65,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form data
 
 // api routes here
-app.use("/terraces", terraceRoutes);
-app.use('/api',userRoutes)
+app.use('/',userRoutes);
+app.use('/', terraceRoutes);
 
 // middleware -->
 // app.use(notFound);
