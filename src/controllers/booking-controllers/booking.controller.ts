@@ -3,6 +3,7 @@ import Booking from "../../models/booking-model/booking.model.js";
 import { bookingSchema } from "../../models/booking-model/zod/booking.schema.js";
 import { Request, Response } from "express";
 import { existsSync } from "fs";
+import { error } from "console";
 
 
 //this is a Post Route
@@ -102,7 +103,17 @@ export const deleteBookingById= async(req:Request, res:Response)=>{
     try {
         const {id}=bookingSchema.parse(req.params)
         const booking=await Booking.findByPk(id)
+
+        if(!booking){
+            return res.status(404).json({error:"booking doesn't exist"})
+        }
+        await booking.destroy()
+        return res.status(200).json({message:"booking deleted successfully"})
     } catch (error:any) {
-        
+        if(error instanceof ZodError){
+            return res.status(400).json({error:"invalid id", details:error.errors})
+        }
+        console.error("error deleting booking",error)
+        return res.status(500).json({error:"internal server error"})
     }
 }
