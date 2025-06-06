@@ -72,3 +72,71 @@ export const createPromo = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Error adding promotion" });
     }
 };
+
+export const updatePromo = async (req: Request, res: Response) => {
+    const promoID = req.params.id;
+    const updateData = req.body; // Assuming the update data is sent in the request body
+
+    if (!promoID) {
+        return res.status(400).json({ error: "Invalid or nonexistent promotion ID" });
+    }
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+        return res.status(400).json({ error: "No updated data provided" });
+    }
+
+    try {
+        const [updatedRows] = await Promo.update(updateData, { 
+            where: { id: promoID } 
+        });
+
+        if (updatedRows === 0) {
+            return res.status(404).json({ error: "Promo not found or no changes were made" });
+        }
+
+        res.status(200).json({ 
+            message: "Promo updated successfully",
+            promoID,
+            updatedFields: updateData
+        });
+
+    } catch (error: any) {
+        console.error(`Error updating promotion ID ${userID}: ${error}`);
+
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ 
+                error: "❌ Error updating promotion", 
+                promoID, 
+                details: error.errors
+            });
+        }
+        
+        console.error(`❌ Error updating promotion:`, error);
+        return res.status(500).json({ 
+            error: "Error updating promotion",
+            message: error.message 
+        });
+    }
+};
+
+export const deletePromo = async (req: Request, res: Response) => {
+    const promoID = req.params.id;
+
+    if (!promoID) {
+        return res.status(400).json({ error: "Invalid or nonexistent promotion ID" })
+    }
+
+    try {
+        await Promo.destroy({ where: { id: promoID } });
+        res.sendStatus(200);
+
+    } catch (error: any) {
+        console.error(`Error deleting promotion ID ${promoID}: ${error}`);
+
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error deleting promotion", promoID, details: error.errors});
+        }
+        console.error(`❌ Error adding promotion:`, error);
+        return res.status(500).json({ error: "Error deleting promotion" });
+    }
+};
