@@ -74,3 +74,35 @@ export const getBooking= async(req:Request, res: Response)=>{
         return res.status(500).json()
     }
 }
+
+//this is a Get{id} route
+//http://localhost:8080/booking/{id}
+
+export const getBookingById=async(req:Request, res:Response)=>{
+    try {
+        const {id}=bookingSchema.parse(req.params)
+        const booking=await Booking.findByPk(id)
+        if(!booking){
+            return res.status(404).json({error:"booking doesn't exist"})
+        }
+        return res.status(200).json(booking)
+    } catch (error:any) {
+        if(error instanceof ZodError){
+            return res.status(400).json({error:"invalid Id", details:error.errors})
+        }
+        console.error("error fetching booking", error)
+        return res.status(500).json({error:"internal server error"})
+    }
+}
+
+//this is a delete route
+//http://localhost:8080/booking/{id}
+
+export const deleteBookingById= async(req:Request, res:Response)=>{
+    try {
+        const {id}=bookingSchema.parse(req.params)
+        const booking=await Booking.findByPk(id)
+    } catch (error:any) {
+        
+    }
+}
