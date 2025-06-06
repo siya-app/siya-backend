@@ -7,7 +7,7 @@ class User extends Model {
   public email!: string;
   public name!: string;
   public birth_date!: string;
-  password_hash!: string;
+  password!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -33,7 +33,7 @@ User.init(
       allowNull: false
     },
     birth_date : {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.STRING,
         allowNull: false
     },
     password_hash: {

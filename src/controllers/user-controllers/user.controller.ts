@@ -51,29 +51,61 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 //Function creta returns error.
 
-export const createUser = async (req: Request, res: Response) => {
+// export const createUser = async (req: Request, res: Response) => {
 
-    try {
-        const userData = userSchema.parse(req.body);
+//     try {
+//         // const userData = userSchema.parse(req.body);
+//         const userData = req.body
 
-        if (!userData) {
-            return res.status(204).json({ error: "Invalid or nonexistent user" });
-        }
-        console.log("💡 User data validated:", userData);
 
-        const createdUser = await User.create(userData);
-        return res.status(201).json(createdUser);
+//         if (!userData) {
+//             return res.status(204).json({ error: "Invalid user" });
+//         }
+//         console.log("💡 User data validated:", userData);
 
-    } catch (error: any) {
-        if (error.name === "ZodError") {
-            console.error("🔥 FULL ERROR:", error);
-            return res.status(400).json({ error: "❌ Validation failed", details: error.errors });
-        }
+//         const createdUser = await User.create(userData);
+//         return res.status(201).json(createdUser);
 
-        console.error(`❌ Error adding user:`, error);
-        return res.status(500).json({ error: "Error adding user" });
+//     } catch (error: any) {
+//         if (error.name === "ZodError") {
+//             console.error("🔥 FULL ERROR:", error);
+//             return res.status(400).json({ error: "❌ Validation failed", details: error.errors });
+//         }
+
+//         console.error(`❌ Error adding user:`, error);
+//         return res.status(500).json({ error: "Error adding user" });
+//     }
+// };
+//**********--------------------------------- */
+export const createUser = async (req: Request) => {
+  try {
+    const { name, email, password_hash, birth_date, role } = req.params;
+
+    // Puedes añadir validaciones adicionales aquí (ej. formato de email, complejidad de password)
+
+    // Hashear la contraseña antes de guardarla (¡MUY IMPORTANTE!)
+    // const hashedPassword = await bcrypt.hash(password, 10); // Asumiendo que usas bcrypt
+
+    const newUser = await User.create({
+      name,
+      email,
+      password_hash, //hashedPassword, // Usa la contraseña hasheada
+      birth_date,
+      role: role || 'client', // Por defecto el rol es 'client' si no se especifica
+    });
+
+    return newUser; // Devuelve el nuevo usuario creado
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      throw new Error('El email ya está registrado.');
     }
+    throw new Error('Error al crear el usuario: ' + error.message);
+  }
 };
+
+
+
+//--------------------------------------------------------
 
 export const updateUser = async (req: Request, res: Response) => {
     const userID = req.params.id;
