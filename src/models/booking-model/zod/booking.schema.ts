@@ -5,5 +5,9 @@ export const bookingSchema = z.object({
   party_length: z.number().int().positive("The party length should be a positive integer"),
   has_shown: z.boolean().optional(), 
   user_id: z.string().uuid("Invalid UUID"),
+  is_paid:z.boolean().default(false),
+  payment_id: z.string().nullable().optional(),
+  booking_price: z.number().nonnegative("Must be a positive number").optional(),
+  terrace_id: z.string().uuid("Invalid UUID")
 });
 export type bookingInput=z.infer<typeof bookingSchema>

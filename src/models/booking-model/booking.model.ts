@@ -98,11 +98,17 @@ Booking.belongsTo(Terrace,{
     targetKey:'id'
 })
 
+Booking.beforeCreate((booking) => {
+  if (!booking.booking_price) {
+    booking.booking_price = booking.party_length * 1; // 1 euro por persona
+  }
+});
+
 export default Booking
 
-Booking.beforeCreate('setBookingPrice',(booking) => {
-  booking.booking_price = booking.party_length * 1; 
-});
+// Booking.beforeCreate('setBookingPrice',(booking) => {
+//   booking.booking_price = booking.party_length * 1; 
+// });
   // cata de 1 euro por persona, el before create me lo sugiere (method) Model<TModelAttributes extends {} = any, TCreationAttributes extends {} = TModelAttributes>.beforeCreate<M extends Model>(this: ModelStatic<M>, name: string, fn: (instance: M, options: CreateOptions<Attributes<M>>) => HookReturn): void (+1 overload)
 
 // A hook that is run before creating a single instance
