@@ -101,7 +101,7 @@ export const updatePromo = async (req: Request, res: Response) => {
         });
 
     } catch (error: any) {
-        console.error(`Error updating promotion ID ${userID}: ${error}`);
+        console.error(`Error updating promotion ID ${promoID}: ${error}`);
 
         if (error.name === 'ZodError') {
             return res.status(500).json({ 
