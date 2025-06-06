@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Promo from '../../models/promo-model/promo.model.js';
-import { PromoSchema } from '../../models/promo-model/zod/promo.schema.js'
+import { promoSchema } from '../../models/promo-model/zod/promo.schema.js'
 
 export const getAllPromos = async (req: Request, res: Response) => {
     try {
