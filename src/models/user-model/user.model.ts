@@ -6,7 +6,8 @@ class User extends Model {
   public id!: string;
   public email!: string;
   public name!: string;
-  public age!: number;
+  public birth_date!: string;
+  password_hash!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
