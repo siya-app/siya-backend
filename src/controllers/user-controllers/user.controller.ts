@@ -49,6 +49,7 @@ export const getUserById = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Error fetching user" });
     }
 };
+//Function creta returns error.
 
 export const createUser = async (req: Request, res: Response) => {
 
