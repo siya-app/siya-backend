@@ -1,12 +1,6 @@
-// import { BusinessApiType } from "../../models/zod/business-schema.js";
-// import { TerraceApiType } from "../../models/zod/terrace-schema.js";
-// import {defaultOpeningHours} from "../../utils/defaultOpeningHours.js";
 import { BusinessApiType } from "../../../models/terrace-model/zod/business-schema.js";
 import { TerraceApiType } from "../../../models/terrace-model/zod/terrace-schema.js";
-import { defaultOpeningHours } from "../../../utils/terrace-utils/defaultOpeningHours.js";
-
-
-
+import {defaultOpeningHours} from "../../../utils/terrace-utils/defaultOpeningHours.js";
 
 export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Partial<BusinessApiType>) {
     return {

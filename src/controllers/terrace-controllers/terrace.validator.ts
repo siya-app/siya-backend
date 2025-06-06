@@ -3,9 +3,9 @@ import { matchByCoords } from "./validators/coordsValidator.js";
 import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
 import { createCustomTerrace } from "./validators/createCustomTerrace.js";
 import type { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js";
-import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
-// import Terrace from "../../models/db/terrace-model-sequelize.js";
-import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+// import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
+// import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+
 
 export async function createCustomValidatedTerrace() {
 
