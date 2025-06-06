@@ -8,6 +8,7 @@ import morgan from 'morgan'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
+import reviewRoutes from './routes/review-routes/review.routes.js';
 import { sequelize } from './config/sequelize-config.js';
 
 console.log('--- STARTUP TEST LOG ---');
@@ -67,6 +68,7 @@ app.use(express.urlencoded({ extended: true })); // For form data
 // api routes here
 app.use('/',userRoutes);
 app.use('/', terraceRoutes);
+app.use('/', reviewRoutes);
 
 // middleware -->
 // app.use(notFound);
