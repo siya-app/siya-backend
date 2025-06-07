@@ -4,13 +4,16 @@ import Booking from "../../models/booking-model/booking.model.js";
 import dotenv from 'dotenv'
 
 
-dotenv.config()
+
+
 
 // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 //   apiVersion: "2023-10-16"
 // });
 
-const stripe= new Stripe("sk_test_51RXQxoPrzh3XgfejnuSDD9IVCqllfeet9MM4HAcLbImsl3fX3xMP1M9AsLBdRIR2pZFeLARR76IMIxp0RpgtOHXf00Je6WKMAu")
+const stripe= new Stripe(process.env.STRIPE_PRIVATE_KEY!,{
+     apiVersion: "2023-10-16" as Stripe.LatestApiVersion
+})
 
 export const createSession = async (req: Request, res: Response) => {
   try {
@@ -22,14 +25,14 @@ export const createSession = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Booking not found" });
     }
 
-    // Convert booking_price to a valid integer (in cents)
+  
     const price = Number(booking.booking_price);
 
     if (isNaN(price) || price <= 0) {
       return res.status(400).json({ error: "Invalid booking price" });
     }
 
-    const unitAmount = Math.round(price * 100); // Convert to cents
+    const unitAmount = Math.round(price * 100); 
 
     console.log("Creating Stripe session with:", {
       booking_id: booking.id,
@@ -55,7 +58,7 @@ export const createSession = async (req: Request, res: Response) => {
         },
       ],
       success_url: `http://localhost:3000/success?bookingId=${booking.id}`,
-      cancel_url: `http://localhost:3000/cancel`,
+      cancel_url: `http://localhost:3000/cancel`, //recomendado puerto 3000 esto se manejara desde el front
       metadata: {
         bookingId: booking.id,
       },
