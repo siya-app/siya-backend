@@ -10,7 +10,7 @@ if (!BUSINESS_API) {
 
 // console.log(BUSINESS_API);
 
-const apiBusiness = createApiInstance(BUSINESS_API);
+export const apiBusiness = createApiInstance(BUSINESS_API);
 
 export async function fetchDataBusiness(): Promise<object[]> {
 
