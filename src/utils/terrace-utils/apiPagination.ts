@@ -4,6 +4,7 @@ import { apiTerrace } from "../../services/terrace-services/terrace.service.js";
 import { ENV } from "../../config/env.js";
 import axios from "axios";
 import { response } from "express";
+import { record } from "zod/v4";
 
 
 
@@ -24,23 +25,30 @@ export async function fetchAllTerracePages(): Promise<TerraceApiType[]> {
 
     while (nextUrl) {
         try {
-            const response = await axiosRequest(apiTerrace, nextUrl, { limit: 100 });
+            const response = await axiosRequest(apiTerrace, nextUrl);
             const records = response?.result?.records;
+            const totalLength: number = response?.result?.total
 
-            // console.log(records.map((record:any, index: number) => record.EMPLACAMENT))
-            const totalLength = response?.result?.total;
+            await new Promise((resolve) => setTimeout(resolve, 3000)); // pause to be kind to API
 
-            if (!records || records.length === 0) {
+            console.log(totalLength, `🔍 iteration: ${index}`)
+
+            if (!records) {
                 console.log("✔️ No more records to fetch");
                 break;
             }
+
+
+            console.log(records.map((record:any, index: number) => record.EMPLACAMENT))
+            console.log(records.map((record:any, index: number) => record._id))
 
             allData.push(...records);
             console.log(`✅ Page ${index + 1}: fetched ${records.length} items, total so far: ${allData.length}`);
 
             const nextLink = response.result._links?.next;
+            console.log(nextLink)
             nextUrl = nextLink
-                ? `https://opendata-ajuntament.barcelona.cat${nextLink}`
+                ? `https://opendata-ajuntament.barcelona.cat/data${nextLink}`
                 : null;
 
             await new Promise((resolve) => setTimeout(resolve, 1000)); // pause to be kind to API
