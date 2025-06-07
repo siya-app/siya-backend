@@ -90,7 +90,8 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
+    
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));
+fetchAllTerracePages().catch(err => console.error('Validator error:', err));
