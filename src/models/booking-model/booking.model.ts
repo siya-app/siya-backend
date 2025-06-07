@@ -4,16 +4,19 @@ import User from "../user-model/user.model.js";
 import Terrace from "../terrace-model/db/terrace-model-sequelize.js";
 
 class Booking extends Model{
-    public id!:string;
-    public booking_date!:Date;
-    public booking_time!:string;
-    public is_paid!:boolean;
-    public party_length!:number;
-    public payment_id!:string|null; //aconsejado por si no existe al inicio
-    public has_shown!:boolean;
-    public booking_price!:number
-    public user_id!:string
-    public terrace_id!: string;
+    declare id:string;
+    declare booking_date:Date;
+    declare booking_time:string;
+    declare is_paid:boolean;
+    declare party_length:number;
+    declare payment_id:string|null; //aconsejado por si no existe al inicio
+    declare has_shown:boolean;
+    declare booking_price:number
+    declare user_id:string
+    declare terrace_id: string;
+    static party_length: any;
+    static booking_price: number;
+    static id: any;
 }
 
 Booking.init(
@@ -99,7 +102,7 @@ Booking.belongsTo(Terrace,{
 })
 
 Booking.beforeCreate((booking) => {
-  if (!booking.booking_price) {
+  if (booking.booking_price) {
     booking.booking_price = booking.party_length * 1; // 1 euro por persona
   }
 });

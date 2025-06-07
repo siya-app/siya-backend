@@ -10,6 +10,7 @@ import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
 import { sequelize } from './config/sequelize-config.js';
+import paymentRoutes from "./routes/payment-routes/payment.route.js"
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -69,6 +70,8 @@ app.use(express.urlencoded({ extended: true })); // For form data
 app.use('/',userRoutes);
 app.use('/', terraceRoutes);
 app.use("/", bookingRoutes )
+console.log("⛳ Registering payment routes...");
+app.use("/", paymentRoutes);
 
 // middleware -->
 // app.use(notFound);

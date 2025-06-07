@@ -8,7 +8,7 @@ export const bookingSchema = z.object({
   user_id: z.string().uuid("Invalid UUID"),
   is_paid:z.boolean().default(false),
   payment_id: z.string().nullable().optional(),
-  booking_price: z.number().nonnegative("Must be a positive number").optional(),
+  booking_price: z.number().positive().optional(),
   terrace_id: z.string().uuid("Invalid UUID")
 });
 export type bookingInput=z.infer<typeof bookingSchema>

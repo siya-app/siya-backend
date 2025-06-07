@@ -14,6 +14,10 @@ export const createBooking = async (req:Request, res:Response)=>{
 
         const booking_price=validateData.booking_price??validateData.party_length * 1
 
+        if (isNaN(booking_price) || booking_price <= 0) {
+         throw new Error("Booking price must be a positive number");
+        }
+
         const newBooking=await Booking.create({
             ...validateData,
             booking_price,
