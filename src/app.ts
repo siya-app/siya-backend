@@ -9,6 +9,7 @@ import { createCustomValidatedTerrace } from './controllers/terrace-controllers/
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
 import { sequelize } from './config/sequelize-config.js';
+import { fetchAllTerracePages } from './utils/terrace-utils/apiPagination.js';
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -82,7 +83,8 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
+    
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));
+fetchAllTerracePages().catch(err => console.error('Validator error:', err));
