@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import User from '../../models/user-model/user.model.js';
 import { userSchema } from '../../models/user-model/zod/user.schema.js';
+import { log } from 'console';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcrypt');
 
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -21,25 +24,66 @@ export const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
-    const userID = req.params.id;
+// export const getUserById = async (req: Request, res: Response) => {
+//     const userID = req.params.id;
     
 
-    if (!userID) {
-        return res.status(400).json({ error: "Invalid or nonexistent user ID" });
-    }
+//     if (!userID) {
+//         return res.status(400).json({ error: "Invalid or nonexistent user ID" });
+//     }
 
-    try {
-        const user = await User.findByPk(userID);
+//     try {
+//         const user = await User.findByPk(userID);
         
 
-        if (!user) {
-            return res.status(404).json({ error: "User ID not found" });
-        }
-        res.status(200).json(user);
+//         if (!user) {
+//             return res.status(404).json({ error: "User ID not found" });
+//         }
+//         res.status(200).json(user);
 
-    } catch (error: any) {
-        console.log(`Error fetching user ID ${userID}: error ${error}`);
+//     } catch (error: any) {
+//         console.log(`Error fetching user ID ${userID}: error ${error}`);
+
+//         if (error.name === 'ZodError') {
+//             return res.status(500).json({ error: "❌ Error fetching user", details: error.errors })
+//         }
+
+//         console.error(`❌ Error fetching user:`, error);
+//         return res.status(500).json({ error: "Error fetching user" });
+//     }
+// };
+
+export const getUserByEmailOrId = async (req: Request, res: Response) => {
+    const identifier = req.params.id;
+
+    const uuidV4Regex = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+    try {   
+        let user;
+
+        if (uuidV4Regex.test(identifier)) {
+            user = await User.findByPk(identifier, {
+            attributes: { exclude: ['password_hash'] }
+            });
+           
+            
+        } 
+
+        else 
+        {
+          
+            
+        user = await User.findOne({
+            where: { email: identifier },
+            attributes: { exclude: ['password_hash'] }
+             });
+             } 
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+            res.status(200).json(user);
+            } catch (error) {
+                console.log(`Error fetching user : ${identifier}: error ${error}`);
 
         if (error.name === 'ZodError') {
             return res.status(500).json({ error: "❌ Error fetching user", details: error.errors })
@@ -47,9 +91,10 @@ export const getUserById = async (req: Request, res: Response) => {
 
         console.error(`❌ Error fetching user:`, error);
         return res.status(500).json({ error: "Error fetching user" });
-    }
-};
-//Function creta returns error.
+    } }
+
+
+
 
 // export const createUser = async (req: Request, res: Response) => {
 
@@ -79,19 +124,18 @@ export const getUserById = async (req: Request, res: Response) => {
 //**********--------------------------------- */
 export const createUser = async (req: Request) => {
   try {
-    const { name, email, password_hash, birth_date, role } = req.params;
+   
+    const { name, email, password_hash, birth_date, role } = userSchema.parse(req.params);
 
-    // Puedes añadir validaciones adicionales aquí (ej. formato de email, complejidad de password)
-
-    // Hashear la contraseña antes de guardarla (¡MUY IMPORTANTE!)
-    // const hashedPassword = await bcrypt.hash(password, 10); // Asumiendo que usas bcrypt
+  
+    const hashedPassword = await bcrypt.hash(password_hash, 10); // Asumiendo que usas bcrypt
 
     const newUser = await User.create({
       name,
       email,
-      password_hash, //hashedPassword, // Usa la contraseña hasheada
+      password_hash: hashedPassword, 
       birth_date,
-      role: role || 'client', // Por defecto el rol es 'client' si no se especifica
+      role: role || 'client'
     });
 
     return newUser; // Devuelve el nuevo usuario creado
