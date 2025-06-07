@@ -28,7 +28,7 @@ export const axiosCreate = async (
 export const axiosRequest = async (
     api: AxiosInstance,
     url: string,
-    queryParams?: object
+    queryParams?: object | number
 ) => {
 
     let apiResponse: JSON | object[] | null = null;

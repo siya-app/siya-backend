@@ -1,6 +1,8 @@
 import { createApiInstance } from '../../config/api-connection-config.js'
 import { axiosRequest } from '../../config/api-connection-service.js';
 import { ENV } from '../../config/env.js';
+import { TerraceApiType } from '../../models/terrace-model/zod/terrace-schema.js';
+
 
 const TERRACE_API: string = ENV.TERRACE_API_URL || "";
 
@@ -8,9 +10,9 @@ if (!TERRACE_API) {
     throw new Error("Environment variable TERRACE_API_URL is not defined");
 }
 
-const apiTerrace = createApiInstance(TERRACE_API);
+export const apiTerrace = createApiInstance(TERRACE_API);
 
-export async function fetchDataTerraces(): Promise<object[]> {
+export async function fetchDataTerraces(): Promise<TerraceApiType[]> {
 
     try {
         const response = await axiosRequest(apiTerrace, TERRACE_API, { limit: 3 });
@@ -25,10 +27,11 @@ export async function fetchDataTerraces(): Promise<object[]> {
 
         console.log("✅🍸 Received data from api terraces,", "records.length", records.length, "total length:", totalLength);
         console.log("✅ Received terraces data.records");
-        return response;
+        return records;
 
     } catch (error) {
         console.log("❌ Error fetching terraces, error:", error);
         return [];
     }
+    
 }
