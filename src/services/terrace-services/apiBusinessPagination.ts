@@ -1,11 +1,8 @@
 import { axiosRequest } from "../../config/api-connection-service.js";
 import { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js";
-import { apiTerrace } from "../../services/terrace-services/terrace.service.js";
+import { apiBusiness } from "./business.service.js";
 import { ENV } from "../../config/env.js";
-import axios from "axios";
-import { response } from "express";
-import { record } from "zod/v4";
-
+import { BusinessApiType, BusinessSchema } from "../../models/terrace-model/zod/business-schema.js";
 
 
 type PaginatedAPIResponse<T> = {
@@ -18,14 +15,14 @@ type PaginatedAPIResponse<T> = {
     };
 };
 
-export async function fetchAllTerracePages(): Promise<TerraceApiType[]> {
-    const allData: TerraceApiType[] = [];
-    let nextUrl: string | null = ENV.TERRACE_API_URL;
+export async function fetchAllBusinessPages(): Promise<BusinessApiType[]> {
+    const allRestaurantsData: BusinessApiType[] = [];
+    let nextUrl: string | null = ENV.BUSINESS_API_URL;
     let index = 0;
 
     while (nextUrl) {
         try {
-            const response = await axiosRequest(apiTerrace, nextUrl);
+            const response = await axiosRequest(apiBusiness, nextUrl);
             const records = response?.result?.records;
             const totalLength: number = response?.result?.total
 
@@ -39,11 +36,15 @@ export async function fetchAllTerracePages(): Promise<TerraceApiType[]> {
             }
 
 
-            console.log(records.map((record:any, index: number) => record.EMPLACAMENT))
-            console.log(records.map((record:any, index: number) => record._id))
+            // console.log(records.map((record:any, index: number) => record.Nom_Local + index));
 
-            allData.push(...records);
-            console.log(`✅ Page ${index + 1}: fetched ${records.length} items, total so far: ${allData.length}`);
+            records.map((record: BusinessApiType) => {
+                if (record.Codi_Activitat_2022 === "1400002") {
+                    console.log(record.Nom_Local)
+                    allRestaurantsData.push(record)
+                }
+            })
+            console.log(`✅ Page ${index + 1}: fetched ${records.length} items, total so far: ${allRestaurantsData.length}`);
 
             const nextLink = response.result._links?.next;
             console.log(nextLink)
@@ -60,6 +61,6 @@ export async function fetchAllTerracePages(): Promise<TerraceApiType[]> {
         }
     }
 
-    console.log(`🏁 All records fetched: ${allData.length}`);
-    return allData;
+    console.log(`🏁 All records fetched: ${allRestaurantsData.length}`);
+    return allRestaurantsData;
 }
