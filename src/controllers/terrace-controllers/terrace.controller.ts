@@ -1,5 +1,5 @@
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
-import { CustomTerraceSchema, CustomTerraceType } from '../../models/terrace-model/zod/customTerrace-schema.js';
+import { CustomTerraceSchema } from '../../models/terrace-model/zod/customTerrace-schema.js';
 import { Request, Response } from 'express';
 
 
@@ -12,7 +12,7 @@ export const getAllTerraces = async (req: Request, res: Response) => {
         res.status(200);
 
     } catch (error: any) {
-        console.log(`Error fetching terraces: error ${error}`);
+        console.error(`Error fetching terraces: error ${error}`);
 
         if (error.name === 'ZodError') {
             return res.status(500).json({ error: "❌ Error fetching terraces", details: error.errors })
@@ -43,7 +43,7 @@ export const getTerraceById = async (req: Request, res: Response) => {
         res.status(200).json(terrace);
 
     } catch (error: any) {
-        console.log(`Error fetching terrace ID-${terraceID}: error ${error}`);
+        console.error(`Error fetching terrace ID-${terraceID}: error ${error}`);
 
         if (error.name === 'ZodError') {
             return res.status(500).json({ error: "❌ Error fetching terrace", details: error.errors })
@@ -56,7 +56,6 @@ export const getTerraceById = async (req: Request, res: Response) => {
 
 // http://localhost:8080/terraces
 // POST items
-
 export const createNewTerrace = async (req: Request, res: Response) => {
 
     try {
@@ -65,7 +64,7 @@ export const createNewTerrace = async (req: Request, res: Response) => {
         if (!terraceData) {
             return res.status(204).json({ error: "Invalid or inexistent terrace" });
         }
-        console.log("💡 terraceData validated:", terraceData);
+        console.warn("💡 terraceData validated:", terraceData);
 
         const createdTerrace = await Terrace.create(terraceData);
         return res.status(201).json(createdTerrace);
@@ -83,34 +82,6 @@ export const createNewTerrace = async (req: Request, res: Response) => {
 
 // http://localhost:8080/terraces/id
 // PUT items/:id
-// export const updateTerrace = async (req: Request, res: Response) => {
-//     const terraceID = req.params.id;
-//     const terraceData = req.body;
-//     console.log("📦 Data received to update:", terraceData);
-//     console.warn(terraceID, "terraceID")
-    
-//     if (!terraceID) {
-//         return res.status(400).json({ err: "Invalid or inexistent terrace data" });
-//     }
-
-//     try {
-//         await Terrace.update(terraceData, { where: { id: terraceID } });
-//         // if (updatedTerrace === 0) {
-//         //     return res.status(404).json({ error: "Terrace not found" });
-//         // }
-//         res.sendStatus(200);
-
-//     } catch (error: any) {
-//         console.error(`Error updating terrace ID-${terraceID}: ${error}`);
-//         if (error.name === 'ZodError') {
-//             return res.status(500).json({ error: "❌ Error updating terrace", details: error.errors });
-//         }
-
-//         console.error(`❌ Error adding terrace:`, error);
-//         return res.status(500).json({ error: "Error updating terrace" });
-//     }
-// };
-
 export const updateTerrace = async (req: Request, res: Response) => {
     const terraceID = req.params.id;
     const updateData = req.body; // Assuming the update data is sent in the request body
@@ -157,41 +128,8 @@ export const updateTerrace = async (req: Request, res: Response) => {
     }
 };
 
-// export const updateTerrace = async (req: Request, res: Response) => {
-//     const terraceID = req.params.id;
-//     const terraceData = req.body;
-
-//     if (!terraceID) {
-//         return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
-//     }
-
-//     try {
-//         const terraceToUpdate = await Terrace.findByPk(terraceID);
-//         console.error(`terrace: ${terraceToUpdate}`);
-
-//         if (!terraceToUpdate) {
-//             return res.status(404).json({ error: "Terrace not found", terraceToUpdate });
-//         }
-
-//         await terraceToUpdate.update(terraceData);
-
-//         return res.status(200).json(terraceToUpdate);
-
-//     } catch (error: any) {
-//         console.error(`❌ Error updating terrace ID-${terraceID}:`, error);
-//         return res.status(500).json({ error: "Error updating terrace" });
-//     }
-// };
-
-// export const updateTerrace = async (req: Request, res: Response) => {
-//     const terraceID = req.params.id;
-//     res.status(200).json({message: `update test ${terraceID}`})
-// }
-
 // http://localhost:8080/terraces
 // DELETE items/:id
-
-
 export const deleteTerrace = async (req: Request, res: Response) => {
     const terraceID = req.params.id;
 

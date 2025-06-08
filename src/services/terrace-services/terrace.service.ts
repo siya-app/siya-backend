@@ -21,16 +21,15 @@ export async function fetchDataTerraces(): Promise<TerraceApiType[]> {
 
         const records = response?.result?.records;
         if (!records || records.length === 0) {
-            console.log("❌ No terrace records found");
+            console.error("❌ No terrace records found");
             return [];
         }
 
         console.log("✅🍸 Received data from api terraces,", "records.length", records.length, "total length:", totalLength);
-        console.log("✅ Received terraces data.records");
         return records;
 
     } catch (error) {
-        console.log("❌ Error fetching terraces, error:", error);
+        console.error("❌ Error fetching terraces, error:", error);
         return [];
     }
     
