@@ -4,7 +4,7 @@ import express from 'express';
 // import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
 import morgan from 'morgan'
-
+import uploadRoutes from './routes/upload-routes/upload.route.js'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
@@ -63,9 +63,11 @@ app.use(cors({
     //TODO take a look at middleware headers auth
 }));
 
-//This middleware parses incoming JSON data from the request body
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // For form data
+
+
+//This middleware parses incoming JSON data from the request body, limit 50mb for saving space
+app.use(express.json({limit:"50mb"}));
+app.use(express.urlencoded({ extended: true, limit:"50mb" })); // For form data
 
 // api routes here
 app.use('/',userRoutes);
@@ -73,6 +75,7 @@ app.use('/', terraceRoutes);
 app.use("/", bookingRoutes )
 
 app.use("/", paymentRoutes);
+app.use('/', uploadRoutes)
 
 // middleware -->
 // app.use(notFound);
