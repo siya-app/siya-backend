@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSession } from "../../controllers/payment-controllers/payment.controller.js";
+import { createSession } from "../../services/payment-service/payment.service.js";
 
 const router= Router()
 

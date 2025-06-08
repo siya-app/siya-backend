@@ -71,7 +71,7 @@ app.use(express.urlencoded({ extended: true })); // For form data
 app.use('/',userRoutes);
 app.use('/', terraceRoutes);
 app.use("/", bookingRoutes )
-console.log("⛳ Registering payment routes...");
+
 app.use("/", paymentRoutes);
 
 // middleware -->
