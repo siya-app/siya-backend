@@ -95,7 +95,7 @@ export const axiosDelete = async (
 
     try {
         await api.delete(`${endpoint}/${id}`);
-        return console.log(`User id:${id} deleted successfully.`)
+        return console.warn(`User id:${id} deleted successfully.`)
 
     } catch (error) {
         if (axios.isAxiosError(error)) {

@@ -18,7 +18,7 @@ export const sequelize = new Sequelize(
                 rejectUnauthorized: false, // Puede ser necesario en desarrollo para evitar errores de certificado
             },
         },
-        logging: console.log, // Puedes cambiar a true para ver las consultas SQL en la consola
+        logging: console.warn, // Puedes cambiar a true para ver las consultas SQL en la consola
     }
 );
 
@@ -26,7 +26,7 @@ export const sequelize = new Sequelize(
 export async function testConnection() {
     try {
         await sequelize.authenticate();
-        console.log('✅ Conexión a la base de datos establecida correctamente.');
+        console.warn('✅ Conexión a la base de datos establecida correctamente.');
     } catch (error) {
         console.error('❌ No se pudo conectar a la base de datos:', error);
     }

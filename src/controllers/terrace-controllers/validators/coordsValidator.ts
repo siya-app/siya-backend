@@ -10,6 +10,7 @@ export function matchByCoords(
     if (!Array.isArray(businesses)) return null;
 
     const matches = businesses.filter(biz => {
+        console.warn(`biz ${biz} vs terrace ${terrace}`)
         const latDiff = Math.abs(parseFloat(biz.Latitud) - parseFloat(terrace.LATITUD));
         const longDiff = Math.abs(parseFloat(biz.Longitud) - parseFloat(terrace.LONGITUD));
         return latDiff < coordinateTolerance && longDiff < coordinateTolerance;

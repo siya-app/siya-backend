@@ -5,7 +5,7 @@ import {defaultOpeningHours} from "../../../utils/terrace-utils/defaultOpeningHo
 export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Partial<BusinessApiType>) {
     return {
         id: biz.ID_Global,
-        business_name: biz.Nom_CComercial,
+        business_name: biz.Nom_Local,
         cadastro_ref: biz.Referencia_Cadastral,
         street_type: biz.Nom_Via,
         street_address: biz.Nom_Local,

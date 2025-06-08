@@ -3,6 +3,7 @@ import { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js
 import { apiBusiness } from "./business.service.js";
 import { ENV } from "../../config/env.js";
 import { BusinessApiType, BusinessSchema } from "../../models/terrace-model/zod/business-schema.js";
+import { writeFileSync } from "fs";
 
 
 type PaginatedAPIResponse<T> = {
@@ -28,26 +29,28 @@ export async function fetchAllBusinessPages(): Promise<BusinessApiType[]> {
 
             await new Promise((resolve) => setTimeout(resolve, 3000)); // pause to be kind to API
 
-            console.log(totalLength, `🔍 iteration: ${index}`)
+            // console.log(totalLength, `🔍 iteration: ${index}`)
 
             if (!records) {
-                console.log("✔️ No more records to fetch");
+                console.log("✔️ No more business to fetch, finishing loop");
                 break;
             }
+
+            allRestaurantsData.push(...records);
 
 
             // console.log(records.map((record:any, index: number) => record.Nom_Local + index));
 
-            records.map((record: BusinessApiType) => {
-                if (record.Codi_Activitat_2022 === "1400002") {
-                    console.log(record.Nom_Local)
-                    allRestaurantsData.push(record)
-                }
-            })
-            console.log(`✅ Page ${index + 1}: fetched ${records.length} items, total so far: ${allRestaurantsData.length}`);
+            // records.map((record: BusinessApiType) => {
+                // if (record.Codi_Activitat_2022 === "1400002" || record.Codi_Activitat_2022 === "1400003") {
+                //     console.log(`biz name --> ${record.Nom_Local}`)
+                    // allRestaurantsData.push(record)
+                // }
+            // })
+            // console.log(`✅ Page ${index + 1}: fetched ${records.length} items, total so far: ${allRestaurantsData.length}`);
 
             const nextLink = response.result._links?.next;
-            console.log(nextLink)
+            // console.log(nextLink)
             nextUrl = nextLink
                 ? `https://opendata-ajuntament.barcelona.cat/data${nextLink}`
                 : null;
@@ -56,11 +59,12 @@ export async function fetchAllBusinessPages(): Promise<BusinessApiType[]> {
             index++;
 
         } catch (error: any) {
-            console.log("❌ Error fetching terraces:", error?.message || error);
+            console.error("❌ Error fetching businesses:", error?.message || error);
             break;
         }
     }
 
-    console.log(`🏁 All records fetched: ${allRestaurantsData.length}`);
+    console.warn(`🏁 All businesses fetched: ${allRestaurantsData.length}`);
+    writeFileSync("data/businesses.json", JSON.stringify(allRestaurantsData, null, 2));
     return allRestaurantsData;
 }

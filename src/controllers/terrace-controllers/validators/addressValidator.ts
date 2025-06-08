@@ -2,43 +2,6 @@ import { matches } from "validator";
 import type { BusinessApiType } from "../../../models/terrace-model/zod/business-schema.js";
 import { TerraceApiType } from "../../../models/terrace-model/zod/terrace-schema.js";
 
-// export type InvalidMatch = {
-//     name: string,
-//     address: string
-//     lat: number,
-//     long: number
-// }
-
-// export type CoordResult = {
-//     matches: BusinessApiType[],
-//     invalidMatches: InvalidMatch[]
-// }
-
-// export function refineMatchByAddress(
-//     terrace: TerraceApiType,
-//     businesses: BusinessApiType[]
-// ): CoordResult | null {
-
-//     let validMatchesByAddress: BusinessApiType[] = [];
-//     let invalidMatchesByAddress: BusinessApiType[] = [];
-//     const emplacement = terrace.EMPLACAMENT.toLowerCase();
-//     if (businesses.length === 1) { return null
-
-//     } else {
-//         validMatchesByAddress = businesses.filter((biz) => {
-//             const matchStreetName = emplacement.includes(biz.Nom_Via.toLowerCase() ?? []);
-//             const matchStreetDoor = emplacement.includes(String(biz.Porta) ?? []);
-//             return matchStreetName && matchStreetDoor;
-//         });
-//     }
-// invalidMatchesByAddress.push(`invalid biz -> biz.name, biz.address...`)
-
-//     return {
-//         validMatchesByAddress,
-//         invalidMatches
-
-//     }
-// }
 export type InvalidMatch = {
     name: string;
     address: string;
@@ -46,11 +9,6 @@ export type InvalidMatch = {
     long: string;
     reason: 'MISSING_STREET' | 'MISSING_NUMBER' | 'BOTH_MISSING';
 }
-
-// export type CoordResult = {
-//     validMatches: BusinessApiType[];
-//     invalidMatches: InvalidMatch[];
-// }
 
 function normalizeString(s: string): string {
     return s.toLowerCase().replace(/[^\w\s]/g, '').trim();
@@ -63,11 +21,6 @@ export function matchByCoordsAndAddress(
 
     const validMatches: object[] = [];
     const invalidMatches: object[] = [];
-
-    // const result: CoordResult = {
-    //     validMatches: [],
-    //     invalidMatches: []
-    // };
 
     const emplacement = normalizeString(terrace.EMPLACAMENT);
 
@@ -87,7 +40,7 @@ export function matchByCoordsAndAddress(
             if (!hasStreet && hasNumber) reason = 'MISSING_STREET';
 
             invalidMatches.push({
-                name: biz.Nom_CComercial || 'Unknown',
+                name: biz.Nom_Local || 'Unknown name',
                 address: terrace.EMPLACAMENT,
                 lat: biz.Latitud,
                 long: biz.Longitud,

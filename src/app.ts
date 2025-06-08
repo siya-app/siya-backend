@@ -1,5 +1,5 @@
 
-console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
+// console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 // import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
@@ -11,7 +11,7 @@ import userRoutes from './routes/user-routes/user.routes.js'
 import { sequelize } from './config/sequelize-config.js';
 import { fetchAllBusinessPages } from './services/terrace-services/apiBusinessPagination.js';
 
-console.log('--- STARTUP TEST LOG ---');
+// console.log('--- STARTUP TEST LOG ---');
 
 console.log('Environment loaded:', {
     apiUrl1: process.env.BUSINESS_API_URL,
@@ -50,7 +50,7 @@ const port = process.env.PORT || 8080;
 app.use(morgan('dev'))
 
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    // console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
@@ -87,4 +87,4 @@ app.listen(port, () => {
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-fetchAllBusinessPages().catch(err => console.error('Validator error:', err));
+createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));
