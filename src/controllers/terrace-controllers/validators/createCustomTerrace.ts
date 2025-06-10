@@ -9,7 +9,7 @@ export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Parti
         cadastro_ref: biz.Referencia_Cadastral,
         street_type: biz.Nom_Via,
         street_address: biz.Nom_Local,
-        door_address: biz.Porta,
+        door_address: biz.Num_Policia_Inicial,
         activity_code: biz.Codi_Activitat_2022,
         group_activity_code: biz.Codi_Activitat_2022,
         district_name: biz.Codi_Districte,

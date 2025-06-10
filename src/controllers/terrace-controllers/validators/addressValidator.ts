@@ -26,7 +26,7 @@ export function matchByCoordsAndAddress(
 
     businesses.forEach(biz => {
         const streetName = normalizeString(biz.Nom_Via) ?? '';
-        const streetNumber = biz.Porta ? String(biz.Porta) : '';
+        const streetNumber = biz.Porta ? String(biz.Num_Policia_Inicial) : '';
 
         const hasStreet = streetName && emplacement.includes(streetName);
         const hasNumber = streetNumber && emplacement.includes(streetNumber);
