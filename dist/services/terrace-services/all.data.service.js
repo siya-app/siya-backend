@@ -1,9 +1,9 @@
-import { fetchDataBusiness } from "./business.service.js";
-import { fetchDataTerraces } from "./terrace.service.js";
+import { fetchAllTerracePages } from "./apiTerracePagination.js";
+import { fetchAllBusinessPages } from "./apiBusinessPagination.js";
 export async function fetchAllDataFromApis() {
     const [businesses, terraces] = await Promise.all([
-        fetchDataBusiness(),
-        fetchDataTerraces()
+        fetchAllBusinessPages(),
+        fetchAllTerracePages()
     ]);
     return { businesses, terraces };
 }

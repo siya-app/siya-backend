@@ -1,17 +1,9 @@
-// export type CoordResult = {
-//     validMatches: BusinessApiType[];
-//     invalidMatches: InvalidMatch[];
-// }
 function normalizeString(s) {
     return s.toLowerCase().replace(/[^\w\s]/g, '').trim();
 }
 export function matchByCoordsAndAddress(terrace, businesses) {
     const validMatches = [];
     const invalidMatches = [];
-    // const result: CoordResult = {
-    //     validMatches: [],
-    //     invalidMatches: []
-    // };
     const emplacement = normalizeString(terrace.EMPLACAMENT);
     businesses.forEach(biz => {
         const streetName = normalizeString(biz.Nom_Via) ?? '';
@@ -28,7 +20,7 @@ export function matchByCoordsAndAddress(terrace, businesses) {
             if (!hasStreet && hasNumber)
                 reason = 'MISSING_STREET';
             invalidMatches.push({
-                name: biz.Nom_CComercial || 'Unknown',
+                name: biz.Nom_Local || 'Unknown name',
                 address: terrace.EMPLACAMENT,
                 lat: biz.Latitud,
                 long: biz.Longitud,

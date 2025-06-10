@@ -10,6 +10,7 @@ import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
 import { sequelize } from './config/sequelize-config.js';
 import { fetchAllBusinessPages } from './services/terrace-services/apiBusinessPagination.js';
+import { fetchAllTerracePages } from './services/terrace-services/apiTerracePagination.js';
 
 // console.log('--- STARTUP TEST LOG ---');
 
@@ -87,4 +88,4 @@ app.listen(port, () => {
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));
+fetchAllBusinessPages().catch((err: Error) => console.error('Validator error:', err));

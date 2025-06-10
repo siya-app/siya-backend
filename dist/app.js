@@ -1,10 +1,12 @@
-console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
+// console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
 // import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
-import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
+import morgan from 'morgan';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
-console.log('--- STARTUP TEST LOG ---');
+import userRoutes from './routes/user-routes/user.routes.js';
+import { fetchAllBusinessPages } from './services/terrace-services/apiBusinessPagination.js';
+// console.log('--- STARTUP TEST LOG ---');
 console.log('Environment loaded:', {
     apiUrl1: process.env.BUSINESS_API_URL,
     apiUrl2: process.env.TERRACE_API_URL
@@ -34,13 +36,14 @@ process.on('uncaughtException', (err) => {
 //!
 const app = express();
 const port = process.env.PORT || 8080;
+app.use(morgan('dev'));
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    // console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 app.use(cors({
     origin: 'http://localhost:5173', // Allow only your frontend // 5173 for vite app
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
     credentials: true // If cookies/auth headers needed!
     //TODO take a look at middleware headers auth
 }));
@@ -48,7 +51,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form data
 // api routes here
-app.use("/terraces", terraceRoutes);
+app.use('/', userRoutes);
+app.use('/', terraceRoutes);
 // middleware -->
 // app.use(notFound);
 // app.use(handleError);
@@ -63,5 +67,5 @@ app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
 });
 console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));
+fetchAllBusinessPages().catch((err) => console.error('Validator error:', err));
 //# sourceMappingURL=app.js.map
