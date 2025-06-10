@@ -94,4 +94,4 @@ app.listen(port, () => {
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-fetchAllBusinessPages().catch((err: Error) => console.error('Validator error:', err));
+// fetchAllBusinessPages().catch((err: Error) => console.error('Validator error:', err));

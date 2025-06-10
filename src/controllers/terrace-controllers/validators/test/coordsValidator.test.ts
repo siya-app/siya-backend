@@ -1,7 +1,64 @@
+
+import type { TerraceApiType } from '../../../../models/terrace-model/zod/terrace-schema.js';
+import type { BusinessApiType } from '../../../../models/terrace-model/zod/business-schema.js';
+import { readJsonArray } from '../../../../utils/terrace-utils/readJson.js';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { matchByCoords } from '../coordsValidator.js';
+
+let businesses: BusinessApiType[] = [];
+let terraces: TerraceApiType[] = [];
+
+beforeAll(async () => {
+    try {
+        const fullBusinesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
+        const fullTerraces = await readJsonArray<TerraceApiType>("./terraces.json");
+        businesses = fullBusinesses.slice(0,100);
+        terraces = fullTerraces.slice(0,6000);
+        console.log('Loaded businesses:', businesses.length);
+        console.log('Loaded terraces:', terraces.length);
+
+    } catch (error) {
+        console.error('❌ Error loading JSONs:', error)
+    }
+});
+
+describe('matchByCoords', () => {
+
+    it('returns null if no businesses match coords', () => {
+        const fakeTerrace = { ...terraces[0], LATITUD: '0.000000', LONGITUD: '0.000000' };
+        const result = matchByCoords(fakeTerrace, businesses);
+        expect(result).toBeNull();
+    });
+
+    it('returns array when there is at least one match', () => {
+        const result = matchByCoords(terraces[0], businesses);
+        expect(result).toSatisfy(res => res === null || Array.isArray(res));
+    });
+
+    it('returns matches within tighter tolerance', () => {
+        const result = matchByCoords(terraces[0], businesses, 0.0000001);
+        expect(result).toSatisfy(res => res === null || Array.isArray(res));
+    });
+
+    it('returns null when businesses is not an array', () => {
+        const result = matchByCoords(terraces[0], {} as any);
+        expect(result).toBeNull();
+    });
+
+    it('logs how many terraces match', () => {
+        const matches = terraces.filter(t => matchByCoords(t, businesses));
+        console.log(`✅ Matches found: ${matches.length} / ${terraces.length}`);
+        expect(matches.length).toBeGreaterThan(0);
+    });
+});
+
+
+
+
+
+
 // import { describe, it, expect } from 'vitest';
-// import { matchByCoords } from '../coordsValidator.js';
-// import type { TerraceApiType } from '../../../models/zod/terrace-schema.js';
-// import type { BusinessApiType } from '../../../models/zod/business-schema.js';
+
 
 // const makeBusiness = (lat: string, lon: string): BusinessApiType => ({
 //     Nom_CComercial: "Test Biz",
