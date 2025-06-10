@@ -3,7 +3,7 @@ import type { TerraceApiType } from '../../../../models/terrace-model/zod/terrac
 import type { BusinessApiType } from '../../../../models/terrace-model/zod/business-schema.js';
 import { readJsonArray } from '../../../../utils/terrace-utils/readJson.js';
 import { describe, it, expect, beforeAll } from 'vitest';
-import { matchByCoords } from '../coordsValidator.js';
+import { matchByCoordsAndAddress } from '../addressValidator.js';
 
 let businesses: BusinessApiType[] = [];
 let terraces: TerraceApiType[] = [];
@@ -12,132 +12,105 @@ beforeAll(async () => {
     try {
         const fullBusinesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
         const fullTerraces = await readJsonArray<TerraceApiType>("./terraces.json");
-        businesses = fullBusinesses.slice(0,100);
-        terraces = fullTerraces.slice(0,6000);
-        console.log('Loaded businesses:', businesses.length);
-        console.log('Loaded terraces:', terraces.length);
-
+        businesses = fullBusinesses.slice(0, 100);
+        terraces = fullTerraces.slice(0, 6000);
+        console.log('Loaded businesses in match x coords:', businesses.length);
+        console.log('Loaded terraces: in match x coords', terraces.length);
     } catch (error) {
-        console.error('❌ Error loading JSONs:', error)
+        console.error('❌ Error loading JSONs:', error);
     }
 });
 
-describe('matchByCoords', () => {
-
-    it('returns null if no businesses match coords', () => {
-        const fakeTerrace = { ...terraces[0], LATITUD: '0.000000', LONGITUD: '0.000000' };
-        const result = matchByCoords(fakeTerrace, businesses);
-        expect(result).toBeNull();
+describe('matchByCoordsAndAddress', () => {
+    it('returns both valid and invalid matches', () => {
+        const terrace = terraces[0];
+        const matchingBusinesses = businesses.slice(0, 5); // Test with first 5 businesses
+        
+        const result = matchByCoordsAndAddress(terrace, matchingBusinesses);
+        
+        expect(result).toHaveProperty('validMatches');
+        expect(result).toHaveProperty('invalidMatches');
+        expect(Array.isArray(result.validMatches)).toBe(true);
+        expect(Array.isArray(result.invalidMatches)).toBe(true);
     });
 
-    it('returns array when there is at least one match', () => {
-        const result = matchByCoords(terraces[0], businesses);
-        expect(result).toSatisfy(res => res === null || Array.isArray(res));
+    it('finds valid matches when address components match', () => {
+        // Find a terrace and business that likely match
+        const testTerrace = terraces.find(t => 
+            t.EMPLACAMENT && t.EMPLACAMENT.match(/\d+/)
+        );
+        
+        if (!testTerrace) {
+            console.warn('No terrace with address number found in test data');
+            return;
+        }
+        
+        // Create a matching business
+        const addressParts = testTerrace.EMPLACAMENT.split(' ');
+        const streetName = addressParts.slice(0, -1).join(' ');
+        const streetNumber = addressParts[addressParts.length - 1];
+        
+        const testBusiness: BusinessApiType = {
+            ...businesses[0],
+            Nom_Via: streetName,
+            Porta: streetNumber
+        };
+        
+        const result = matchByCoordsAndAddress(testTerrace, [testBusiness]);
+        
+        expect(result.validMatches).toHaveLength(1);
+        expect(result.invalidMatches).toHaveLength(0);
     });
 
-    it('returns matches within tighter tolerance', () => {
-        const result = matchByCoords(terraces[0], businesses, 0.0000001);
-        expect(result).toSatisfy(res => res === null || Array.isArray(res));
+    it('flags invalid matches when street name is missing', () => {
+        const testTerrace = terraces[0];
+        const testBusiness: BusinessApiType = {
+            ...businesses[0],
+            Nom_Via: 'NON_EXISTENT_STREET', // Won't match
+            Porta: '123'
+        };
+        
+        const result = matchByCoordsAndAddress(testTerrace, [testBusiness]);
+        
+        expect(result.validMatches).toHaveLength(0);
+        expect(result.invalidMatches[0].reason).toBe('MISSING_STREET');
     });
 
-    it('returns null when businesses is not an array', () => {
-        const result = matchByCoords(terraces[0], {} as any);
-        expect(result).toBeNull();
+    it('flags invalid matches when street number is missing', () => {
+        const testTerrace = terraces[0];
+        const addressParts = testTerrace.EMPLACAMENT.split(' ');
+        const streetName = addressParts.slice(0, -1).join(' ');
+        
+        const testBusiness: BusinessApiType = {
+            ...businesses[0],
+            Nom_Via: streetName,
+            Porta: 'NON_EXISTENT_NUMBER' // Won't match
+        };
+        
+        const result = matchByCoordsAndAddress(testTerrace, [testBusiness]);
+        
+        expect(result.validMatches).toHaveLength(0);
+        expect(result.invalidMatches[0].reason).toBe('MISSING_NUMBER');
     });
 
-    it('logs how many terraces match', () => {
-        const matches = terraces.filter(t => matchByCoords(t, businesses));
-        console.log(`✅ Matches found: ${matches.length} / ${terraces.length}`);
-        expect(matches.length).toBeGreaterThan(0);
+    it('handles empty business array', () => {
+        const result = matchByCoordsAndAddress(terraces[0], []);
+        
+        expect(result.validMatches).toHaveLength(0);
+        expect(result.invalidMatches).toHaveLength(0);
+    });
+
+    it('logs matching statistics', () => {
+        const testTerrace = terraces[0];
+        const matchingBusinesses = businesses.slice(0, 10); // Test with first 10 businesses
+        
+        const result = matchByCoordsAndAddress(testTerrace, matchingBusinesses);
+        
+        console.log(`Tested terrace at: ${testTerrace.EMPLACAMENT}`);
+        console.log(`- Valid matches: ${result.validMatches.length}`);
+        console.log(`- Invalid matches: ${result.invalidMatches.length}`);
+        
+        expect(result.validMatches.length + result.invalidMatches.length)
+            .toBe(matchingBusinesses.length);
     });
 });
-
-
-
-
-
-
-// import { describe, it, expect } from 'vitest';
-
-
-// const makeBusiness = (lat: string, lon: string): BusinessApiType => ({
-//     Nom_CComercial: "Test Biz",
-//     Codi_Districte: "01",
-//     Codi_Activitat_2022: "123",
-//     ID_Global: "xyz",
-//     Referencia_Cadastral: "ref",
-//     Nom_Via: "Carrer Test",
-//     Longitud: lon,
-//     Porta: "12",
-//     Nom_Local: "Biz Place",
-//     Codi_Barri: "05",
-//     Codi_Activitat_2016: "456",
-//     Latitud: lat,
-//     Codi_Grup_Activitat: "789",
-//     Nom_Districte: "Eixample",
-//     Nom_Barri: "Sagrada Família",
-// });
-
-// const terrace: TerraceApiType = {
-//     LATITUD: "41.123456",
-//     LONGITUD: "2.123456",
-//     CODI_DISTRICTE: "01",
-//     NOM_DISTRICTE: "Eixample",
-//     CODI_BARRI: "05",
-//     NOM_BARRI: "Sagrada Família",
-//     EMPLACAMENT: "Test St. 12",
-//     OCUPACIO: "",
-//     TAULES: "4",
-//     CADIRES: "8",
-//     TAULES_VORERA: "",
-//     CADIRES_VORERA: "",
-//     TAULES_CALCADA: "",
-//     CADIRES_CALCADA: "",
-//     SUPERFICIE_OCUPADA: "",
-//     DATA_EXPLO: "",
-//     VIGENCIA: "",
-//     ORDENACIO: "",
-//     X_ETRS89: "",
-//     Y_ETRS89: "",
-//     _id: 1,
-// };
-
-// describe('matchByCoords', () => {
-//     it('returns a match if coordinates are exactly the same', () => {
-//         const businesses = [makeBusiness("41.123456", "2.123456")];
-//         const result = matchByCoords(terrace, businesses);
-//         expect(result).toHaveLength(1);
-//     });
-
-//     it('returns null if no coordinates match', () => {
-//         const businesses = [makeBusiness("40.000000", "2.000000")];
-//         const result = matchByCoords(terrace, businesses);
-//         expect(result).toBeNull();
-//     });
-
-//     it('returns null when businesses is not an array', () => {
-//         const result = matchByCoords(terrace, {} as any);
-//         expect(result).toBeNull();
-//     });
-
-//     it('returns multiple matches when several businesses match', () => {
-//         const businesses = [
-//             makeBusiness("41.123456", "2.123456"),
-//             makeBusiness("41.123456", "2.123456"),
-//         ];
-//         const result = matchByCoords(terrace, businesses);
-//         expect(result).toHaveLength(2);
-//     });
-
-//     it('returns null when coords are just outside the tolerance', () => {
-//         const businesses = [makeBusiness("41.123457", "2.123457")]; // ~0.0000011 difference
-//         const result = matchByCoords(terrace, businesses, 0.000001);
-//         expect(result).toBeNull();
-//     });
-
-//     it('returns a match if within increased tolerance', () => {
-//         const businesses = [makeBusiness("41.123457", "2.123457")];
-//         const result = matchByCoords(terrace, businesses, 0.00001); // increase tolerance
-//         expect(result).toHaveLength(1);
-//     });
-// });
