@@ -5,8 +5,6 @@ import User from '../../models/user-model/user.model.js';
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
 //import supabaseAdmin from '../config/supabase-admin.js';
 
-
-
 import { reviewSchema } from '../../models/review-model/zod/review-schema.js';
 
 export const getReviews = async (req: Request, res: Response) => {
