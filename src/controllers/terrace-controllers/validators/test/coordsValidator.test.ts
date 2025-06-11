@@ -3,7 +3,7 @@ import type { TerraceApiType } from '../../../../models/terrace-model/zod/terrac
 import type { BusinessApiType } from '../../../../models/terrace-model/zod/business-schema.js';
 import { readJsonArray } from '../../../../utils/terrace-utils/readJson.js';
 import { describe, it, expect, beforeAll } from 'vitest';
-import { matchByCoordsAndAddress } from '../addressValidator.js';
+import { matchByCoords } from '../coordsValidator.js';
 
 let businesses: BusinessApiType[] = [];
 let terraces: TerraceApiType[] = [];
@@ -12,7 +12,7 @@ beforeAll(async () => {
     try {
         const fullBusinesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
         const fullTerraces = await readJsonArray<TerraceApiType>("./terraces.json");
-        businesses = fullBusinesses.slice(0, 100);
+        businesses = fullBusinesses.slice(0, 6000);
         terraces = fullTerraces.slice(0, 6000);
         console.log('Loaded businesses in match x coords:', businesses.length);
         console.log('Loaded terraces: in match x coords', terraces.length);
@@ -21,96 +21,42 @@ beforeAll(async () => {
     }
 });
 
-describe('matchByCoordsAndAddress', () => {
-    it('returns both valid and invalid matches', () => {
-        const terrace = terraces[0];
-        const matchingBusinesses = businesses.slice(0, 5); // Test with first 5 businesses
-        
-        const result = matchByCoordsAndAddress(terrace, matchingBusinesses);
-        
-        expect(result).toHaveProperty('validMatches');
-        expect(result).toHaveProperty('invalidMatches');
-        expect(Array.isArray(result.validMatches)).toBe(true);
-        expect(Array.isArray(result.invalidMatches)).toBe(true);
+describe('matchByCoords', () => {
+    it('returns null when businesses is not an array', () => {
+        const result = matchByCoords(terraces[0], null as any, 0.000045);
+        expect(result).toBeNull();
     });
 
-    it('finds valid matches when address components match', () => {
-        // Find a terrace and business that likely match
-        const testTerrace = terraces.find(t => 
-            t.EMPLACAMENT && t.EMPLACAMENT.match(/\d+/)
-        );
-        
-        if (!testTerrace) {
-            console.warn('No terrace with address number found in test data');
-            return;
-        }
-        
-        // Create a matching business
-        const addressParts = testTerrace.EMPLACAMENT.split(' ');
-        const streetName = addressParts.slice(0, -1).join(' ');
-        const streetNumber = addressParts[addressParts.length - 1];
-        
-        const testBusiness: BusinessApiType = {
-            ...businesses[0],
-            Nom_Via: streetName,
-            Porta: streetNumber
+    it('returns empty array when no business is within coordinate tolerance', () => {
+        const fakeTerrace: TerraceApiType = {
+            ...terraces[0],
+            LATITUD: "0.000000",
+            LONGITUD: "0.000000"
         };
-        
-        const result = matchByCoordsAndAddress(testTerrace, [testBusiness]);
-        
-        expect(result.validMatches).toHaveLength(1);
-        expect(result.invalidMatches).toHaveLength(0);
+
+        const result = matchByCoords(fakeTerrace, businesses, 0.000045);
+        expect(result).toBeNull();
     });
 
-    it('flags invalid matches when street name is missing', () => {
-        const testTerrace = terraces[0];
-        const testBusiness: BusinessApiType = {
-            ...businesses[0],
-            Nom_Via: 'NON_EXISTENT_STREET', // Won't match
-            Porta: '123'
-        };
-        
-        const result = matchByCoordsAndAddress(testTerrace, [testBusiness]);
-        
-        expect(result.validMatches).toHaveLength(0);
-        expect(result.invalidMatches[0].reason).toBe('MISSING_STREET');
-    });
+    it('returns at least one match when business is very close to terrace', () => {
+        // This assumes at least one match exists in first 100 businesses
+        const testTerrace = terraces.find(t => {
+            return businesses.some(b => {
+                const latDiff = Math.abs(parseFloat(b.Latitud) - parseFloat(t.LATITUD));
+                const longDiff = Math.abs(parseFloat(b.Longitud) - parseFloat(t.LONGITUD));
+                return latDiff < 0.0002 && longDiff < 0.0002;
+            });
+        });
 
-    it('flags invalid matches when street number is missing', () => {
-        const testTerrace = terraces[0];
-        const addressParts = testTerrace.EMPLACAMENT.split(' ');
-        const streetName = addressParts.slice(0, -1).join(' ');
-        
-        const testBusiness: BusinessApiType = {
-            ...businesses[0],
-            Nom_Via: streetName,
-            Porta: 'NON_EXISTENT_NUMBER' // Won't match
-        };
-        
-        const result = matchByCoordsAndAddress(testTerrace, [testBusiness]);
-        
-        expect(result.validMatches).toHaveLength(0);
-        expect(result.invalidMatches[0].reason).toBe('MISSING_NUMBER');
-    });
+        expect(testTerrace).toBeDefined();
 
-    it('handles empty business array', () => {
-        const result = matchByCoordsAndAddress(terraces[0], []);
-        
-        expect(result.validMatches).toHaveLength(0);
-        expect(result.invalidMatches).toHaveLength(0);
-    });
+        const result = matchByCoords(testTerrace!, businesses, 0.0002);
+        expect(result).not.toBeNull();
+        expect(result!.length).toBeGreaterThan(0);
+        console.log('Test terrace used:', testTerrace?.EMPLACAMENT);
 
-    it('logs matching statistics', () => {
-        const testTerrace = terraces[0];
-        const matchingBusinesses = businesses.slice(0, 10); // Test with first 10 businesses
-        
-        const result = matchByCoordsAndAddress(testTerrace, matchingBusinesses);
-        
-        console.log(`Tested terrace at: ${testTerrace.EMPLACAMENT}`);
-        console.log(`- Valid matches: ${result.validMatches.length}`);
-        console.log(`- Invalid matches: ${result.invalidMatches.length}`);
-        
-        expect(result.validMatches.length + result.invalidMatches.length)
-            .toBe(matchingBusinesses.length);
+if (result) {
+    console.log('Matched businesses:', result.map(b => b.Nom_Local));
+}
     });
 });
