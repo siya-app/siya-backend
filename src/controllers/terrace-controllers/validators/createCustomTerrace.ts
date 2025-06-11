@@ -1,78 +1,76 @@
 import { BusinessApiType } from "../../../models/terrace-model/zod/business-schema.js";
 import { TerraceApiType } from "../../../models/terrace-model/zod/terrace-schema.js";
-import {defaultOpeningHours} from "../../../utils/terrace-utils/defaultOpeningHours.js";
+import { defaultOpeningHours } from "../../../utils/terrace-utils/defaultOpeningHours.js";
 import Terrace from "../../../models/terrace-model/db/terrace-model-sequelize.js";
 
-export function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Partial<BusinessApiType>) {
-     Terrace.create = {
+export async function createCustomTerrace(terrace: Partial<TerraceApiType>, biz: Partial<BusinessApiType>) {
+    // Terrace.create = {
+    //     business_name: biz.Nom_Local,
+    //     cadastro_ref: biz.Referencia_Cadastral,
+    //     street_type: biz.Nom_Via,
+    //     street_address: biz.Nom_Local,
+    //     door_address: biz.Num_Policia_Inicial,
+    //     activity_code: biz.Codi_Activitat_2022,
+    //     group_activity_code: biz.Codi_Activitat_2022,
+    //     district_name: biz.Codi_Districte,
+    //     district_code: biz.Codi_Districte,
+    //     neighbourhood_name: biz.Nom_Barri,
+    //     neighbourhood_code: biz.Codi_Barri,
+    //     postal_code: undefined,
+    //     tables: terrace.TAULES,
+    //     seats: terrace.CADIRES,
+    //     latitude: terrace.LATITUD,
+    //     longitude: terrace.LONGITUD,
+    //     average_price: undefined,
+    //     average_rating: undefined,
+    //     has_wifi: undefined,
+    //     pet_friendly: undefined,
+    //     can_smoke: undefined,
+    //     has_disabled_acces: undefined,
+    //     has_kitchen: undefined,
+    //     has_promos: false,
+    //     reservation_fee: 0,
+    //     is_premium: false,
+    //     is_verified: false,
+    //     instagram_account: '',
+    //     food_category: [],
+    //     placement_type: [],
+    //     emotional_tags: [],
+    //     cover_type: [],
+    //     dietary_restrictions: [],
+    //     profile_pic: '',
+    //     opening_hours: defaultOpeningHours
+    // };
+
+    await Terrace.create({
         business_name: biz.Nom_Local,
         cadastro_ref: biz.Referencia_Cadastral,
-        street_type: biz.Nom_Via,
-        street_address: biz.Nom_Local,
-        door_address: biz.Num_Policia_Inicial,
-        activity_code: biz.Codi_Activitat_2022,
-        group_activity_code: biz.Codi_Activitat_2022,
-        district_name: biz.Codi_Districte,
-        district_code: biz.Codi_Districte,
-        neighbourhood_name: biz.Nom_Barri,
-        neighbourhood_code: biz.Codi_Barri,
-        postal_code: undefined,
-        tables: terrace.TAULES,
-        seats: terrace.CADIRES,
-        latitude: terrace.LATITUD,
-        longitude: terrace.LONGITUD,
+        address: terrace.EMPLACAMENT,
+        activity_code: parseInt(biz.Codi_Activitat_2022 || '0'),
+        group_activity_code: parseInt(biz.Codi_Activitat_2022 || '0'),
+        district_name: terrace.NOM_DISTRICTE,
+        district_code: parseInt(terrace.CODI_DISTRICTE || '0'),
+        neighbourhood_name: terrace.NOM_BARRI,
+        neighbourhood_code: parseInt(terrace.CODI_BARRI || '0'),
+        zip_code: undefined,
+        tables: parseInt(terrace.TAULES || '0'),
+        seats: parseInt(terrace.CADIRES || '0'),
+        latitude: parseFloat(terrace.LATITUD || '0'),
+        longitude: parseFloat(terrace.LONGITUD || '0'),
         average_price: undefined,
         average_rating: undefined,
         has_wifi: undefined,
         pet_friendly: undefined,
         can_smoke: undefined,
-        has_disabled_acces: undefined,
+        has_disabled_access: undefined,
         has_kitchen: undefined,
-        has_promos: false,
         reservation_fee: 0,
-        is_premium: false,
-        is_verified: false,
+        is_claimed: false,
         instagram_account: '',
-        food_category: [],
-        placement_type: [],
-        emotional_tags: [],
-        cover_type: [],
-        dietary_restrictions: [],
+        website: '',
         profile_pic: '',
-        opening_hours: defaultOpeningHours
-    };
-
-    return Terrace.create = {
-            business_name!: string;
-            cadastro_ref!: string;
-            street_type!: string;
-            street_address!: string;
-            door_address!: number;
-            activity_code!: number;
-            group_activity_code!: number;
-            district_name!: string;
-            district_code!: number;
-            neighbourhood_name!: string;
-            neighbourhood_code!: number;
-            opening_hours?: string;
-            zip_code?: number;
-            tables!: number;
-            seats!: number;
-            latitude!: number;
-            longitude!: 
-            average_price?: number;
-            average_rating?: number;
-            has_wifi?: boolean;
-            pet_friendly?: boolean;
-            can_smoke?: boolean;
-            has_disabled_acces?: boolean;
-            has_kitchen?: boolean;
-            is_claimed?: boolean;
-            instagram_account?: string;
-            website?: string;
-            profile_pic?: string;
-            reservation_fee?: number;
-    }
+        opening_hours: defaultOpeningHours,
+    });
 }
 
 // {
