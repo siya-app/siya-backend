@@ -2,38 +2,46 @@ import { fetchAllDataFromApis } from "../../services/terrace-services/all.data.s
 import { matchByCoords } from "./validators/coordsValidator.js";
 // import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
 import { createCustomTerrace } from "./validators/createCustomTerrace.js";
+import { createOrUpdateTerrace } from "./validators/createOrUpdateTerrace.js";
 import type { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js";
 import { CustomTerraceType } from "../../models/terrace-model/zod/customTerrace-schema.js";
 import { match } from "assert";
 import { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
 import { readJsonArray } from "../../utils/terrace-utils/readJson.js";
 // import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
-// import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
 
 const customTerracesData: any[] = [];
 let businesses: BusinessApiType[] = [];
 let terraces: TerraceApiType[] = [];
+let fullBusinesses: BusinessApiType[] = [];
+let fullTerraces: TerraceApiType[] = [];
 let uniqueBusinesses: BusinessApiType[] = [];
+let count = 0;
 
 export async function createCustomValidatedTerrace() {
 
     // const { businesses, terraces } = await fetchAllDataFromApis();
     try {
-        businesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
-        terraces = await readJsonArray<TerraceApiType>("./terraces.json");
+        fullBusinesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
+        fullTerraces = await readJsonArray<TerraceApiType>("./terraces.json");
+        businesses = fullBusinesses.slice(0,100);
+        terraces = fullTerraces.slice(0,200);
         console.log('Loaded businesses in createCustomValidatedTerrace():', businesses.length);
         console.log('Loaded terraces: in createCustomValidatedTerrace()', terraces.length);
     } catch (error) {
         console.error('❌ Error loading JSONs:', error);
     }
 
-    let customTerraces: any[] = [];
     const unmatchedTerraces: TerraceApiType[] = [];
 
     for (let i = 0; i < terraces.length; i++) {
         const terrace = terraces[i];
 
-        if (!terrace || !businesses) return console.error(`no data to validate`);
+        if (!terrace || !businesses) {
+            console.error(`no data to validate`);
+            continue;
+        }
 
         let matchingBusinesses: BusinessApiType[] = matchByCoords(
             terrace,
@@ -50,46 +58,17 @@ export async function createCustomValidatedTerrace() {
             continue;
         }
 
-        uniqueBusinesses.forEach((biz) => {
-            const custom = createCustomTerrace(terrace, biz);
-            customTerracesData.push(custom);
-        });
-
-        customTerracesData.forEach((terr, j) => {
-            console.log(`${j + 1} ${terr.business_name}`);
-        })
-    }
-
-    try {
-        if (customTerracesData.length > 0) {
-            console.warn(`here we would bulkCreate terraces`)
-            // await Terrace.bulkCreate(customTerraces, {
-            //     updateOnDuplicate: [
-            //         'business_name',
-            //         'tables',
-            //         'seats',
-            //         'opening_hours',
-            //         'average_price',
-            //         'average_rating',
-            //         'has_wifi',
-            //         'pet_friendly',
-            //         'can_smoke',
-            //         'has_kitchen'
-            //     ]
-            // })
-            console.warn(`customterraces is bigger than zero wiiii - the object would be created`)
+        for (const biz of uniqueBusinesses) {
+            count++;
+            console.warn(biz.Nom_Local)
+            await createOrUpdateTerrace(terrace, biz);
         }
-        console.warn(`Inserted or updated ${customTerraces.length} terraces.`);
+
+    }
 
         if (unmatchedTerraces.length > 0) {
             console.warn(`There are ${unmatchedTerraces.length} unmatched terraces.`);
             console.warn(`There are ${customTerracesData.length} matched terraces.`);
         }
-
-    } catch (err) {
-        console.error('❌ Error saving terraces to DB:', err);
-    }
-
-    // customTerracesData.forEach((biz: BusinessApiType, i: number) => console.log(`${i + 1}. ${biz.Nom_Local}`))
 
 }
