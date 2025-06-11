@@ -164,10 +164,3 @@ Terrace.init({
 );
 
 export default Terrace;
-
-// has_promos
-// reservation_fee
-// is_premium
-// is_verified
-// instagram_account
-
