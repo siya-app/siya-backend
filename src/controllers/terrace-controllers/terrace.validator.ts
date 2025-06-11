@@ -1,70 +1,67 @@
 import { fetchAllDataFromApis } from "../../services/terrace-services/all.data.service.js";
 import { matchByCoords } from "./validators/coordsValidator.js";
-import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
+// import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
 import { createCustomTerrace } from "./validators/createCustomTerrace.js";
 import type { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js";
 import { CustomTerraceType } from "../../models/terrace-model/zod/customTerrace-schema.js";
 import { match } from "assert";
+import { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
+import { readJsonArray } from "../../utils/terrace-utils/readJson.js";
 // import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
 // import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
 
-const customTerracesData = [];
-
+const customTerracesData: any[] = [];
+let businesses: BusinessApiType[] = [];
+let terraces: TerraceApiType[] = [];
+let uniqueBusinesses: BusinessApiType[] = [];
 
 export async function createCustomValidatedTerrace() {
 
-    const { businesses, terraces } = await fetchAllDataFromApis();
+    // const { businesses, terraces } = await fetchAllDataFromApis();
+    try {
+        businesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
+        terraces = await readJsonArray<TerraceApiType>("./terraces.json");
+        console.log('Loaded businesses in createCustomValidatedTerrace():', businesses.length);
+        console.log('Loaded terraces: in createCustomValidatedTerrace()', terraces.length);
+    } catch (error) {
+        console.error('❌ Error loading JSONs:', error);
+    }
+
     let customTerraces: any[] = [];
     const unmatchedTerraces: TerraceApiType[] = [];
 
-    for (let i = 0; i < terraces.length ; i++) {
+    for (let i = 0; i < terraces.length; i++) {
         const terrace = terraces[i];
 
-        let matchingBusinesses = matchByCoords(terrace, businesses);
-        console.warn(`matchingBusinesses after matchByCoords --> ${matchingBusinesses}`)
+        if (!terrace || !businesses) return console.error(`no data to validate`);
 
-        // if(matchingBusinesses !== null ) console.warn(matchingBusinesses[0])
-        
+        let matchingBusinesses: BusinessApiType[] = matchByCoords(
+            terrace,
+            businesses,
+            0.000063
+        ) || [];
 
-        if (!matchingBusinesses || matchingBusinesses.length === 0) {
-            // No coords match → add to unmatched for manual review
+        uniqueBusinesses = Array.from(
+            new Map(matchingBusinesses.map(biz => [biz.ID_Global, biz])).values()
+        );
+
+        if (uniqueBusinesses.length === 0) {
             unmatchedTerraces.push(terrace);
-            console.warn(`no match with coords, trying matching by address`)
             continue;
         }
 
-        if (matchingBusinesses.length === 1) {
-            // Only one match by coords → create directly
-            // find index but how - increment index dynamically
-            const custom = createCustomTerrace(terrace, matchingBusinesses[(0)]);
-            console.warn(`customterrace to create --> ${custom}`)
-            customTerraces.push(custom);
-            matchingBusinesses = [];
-            continue;
+        uniqueBusinesses.forEach((biz) => {
+            const custom = createCustomTerrace(terrace, biz);
+            customTerracesData.push(custom);
+        });
 
-        } else {
-            const { validMatches, invalidMatches } = matchByCoordsAndAddress(terrace, matchingBusinesses) || {};
-
-            if (!validMatches || validMatches.length !== 1) {
-                console.error(`terrace goes to unmatchedTerraces --> ${terrace}`)
-                unmatchedTerraces.push(terrace);
-                matchingBusinesses = [];
-
-            } else {
-                const custom = createCustomTerrace(terrace, validMatches[i]);
-                console.warn(`custom match --> ${custom}`)
-                customTerracesData.push(custom);
-                // console.log(`custom -> ${custom}, validMatches[i] -> ${validMatches[i]}`)
-                // customTerraces.push(custom);
-                console.warn(`here we would create a terrace if it is a valid match`)
-            }
-
-        }
+        customTerracesData.forEach((terr, j) => {
+            console.log(`${j + 1} ${terr.business_name}`);
+        })
     }
 
     try {
-        if (customTerraces.length > 0) {
-            customTerracesData.push(customTerraces)
+        if (customTerracesData.length > 0) {
             console.warn(`here we would bulkCreate terraces`)
             // await Terrace.bulkCreate(customTerraces, {
             //     updateOnDuplicate: [
@@ -86,87 +83,13 @@ export async function createCustomValidatedTerrace() {
 
         if (unmatchedTerraces.length > 0) {
             console.warn(`There are ${unmatchedTerraces.length} unmatched terraces.`);
+            console.warn(`There are ${customTerracesData.length} matched terraces.`);
         }
 
-    } catch(err) {
+    } catch (err) {
         console.error('❌ Error saving terraces to DB:', err);
     }
+
+    // customTerracesData.forEach((biz: BusinessApiType, i: number) => console.log(`${i + 1}. ${biz.Nom_Local}`))
+
 }
-
-
-// aqui iria el cron
-// createCustomValidatedTerrace();
-
-// for (let i = 0; i < terraces.length; i++) {
-//     const terrace = terraces[i] as TerraceApiType;
-
-//     let businessMatchedByCoords: BusinessApiType[] = businesses.filter(biz =>
-//         biz.Latitud === terrace.LATITUD &&
-//         biz.Longitud === terrace.LONGITUD);
-
-//     if (businessMatchedByCoords.length > 1) {
-//         const oneMatchOnlyBusiness = businessMatchedByCoords.find((match) => {
-//             return (
-//                 terrace.EMPLACAMENT.includes(match.Nom_Via) &&
-//                 terrace.EMPLACAMENT.includes(match.Porta)
-//             )
-//         });
-//         businessMatchedByCoords = oneMatchOnlyBusiness ? [oneMatchOnlyBusiness] : [];
-//     }
-
-//     for (const biz of businessMatchedByCoords) {
-//         customTerraces.push({
-//             id: biz.ID_Global,
-//             business_name: biz.Nom_CComercial,
-//             cadastro_ref: biz.Referencia_Cadastral,
-//             street_type: biz.Nom_Via,
-//             street_address: biz.Nom_Local,
-//             door_address: parseInt(biz.Porta) || 0,
-//             activity_code: parseInt(biz.Codi_Activitat_2022) || 0,
-//             group_activity_code: parseInt(biz.Codi_Activitat_2022) || 0,
-//             postal_code: undefined,
-//             district_name: biz.Codi_Districte,
-//             district_code: parseInt(biz.Codi_Districte) || 0,
-//             neighbourhood_name: biz.Nom_Barri,
-//             neighbourhood_code: parseInt(biz.Codi_Barri) || 0,
-//             opening_hours: undefined,
-//             tables: parseInt(terrace.TAULES) || 0,
-//             seats: parseInt(terrace.CADIRES) || 0,
-//             latitude: parseFloat(terrace.LATITUD) || 0,
-//             longitude: parseFloat(terrace.LONGITUD) || 0,
-//             average_price: undefined,
-//             average_rating: undefined,
-//             has_wifi: undefined,
-//             pet_friendly: undefined,
-//             can_smoke: undefined,
-//             has_kitchen: undefined,
-//         });
-//     }
-// }
-// // bulkCreate prevents messing the loop
-// // by saving the objects after it
-// // if Terrace.create() would be inside the loop
-// // --> low performance
-// // updateOnDuplicate will change only the following properties
-// // when updating ddbb
-// //! what if a restaurant changes location?
-// try {
-//     await Terrace.bulkCreate(customTerraces, {
-//         updateOnDuplicate: [
-//             'business_name',
-//             'tables',
-//             'seats',
-//             'opening_hours',
-//             'average_price',
-//             'average_rating',
-//             'has_wifi',
-//             'pet_friendly',
-//             'can_smoke',
-//             'has_kitchen'
-//         ]
-//     });
-
-// } catch(err) {
-//     console.error('❌ Error saving customTerraces to DB:', err);
-//     console.error(err instanceof Error ? err.stack : err);
-// }

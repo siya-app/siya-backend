@@ -6,7 +6,7 @@ import {defaultOpeningHours} from '../../../utils/terrace-utils/defaultOpeningHo
 import { UUID } from 'crypto';
 //TODO find default images!!
 
-class Terrace extends Model {
+export class Terrace extends Model {
     public id!: UUID;
     public business_name!: string;
     public cadastro_ref!: string;
