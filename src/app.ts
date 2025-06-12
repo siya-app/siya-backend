@@ -5,6 +5,7 @@ import uploadRoutes from './routes/upload-routes/upload.route.js'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
+import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
 import { sequelize } from './config/sequelize-config.js';
 import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
 
@@ -70,9 +71,5 @@ app.listen(port, () => {
     
 });
 
-// Runs at --> 2:30 AM on the 1st day of the month every 3 months
-try {
-    cronFetch('30 2 1 */3 *');
-} catch (err) {
-    console.error('Cron error:', err);
-}
+console.log('--- DEBUG: About to call terraceValidator ---');
+createCustomValidatedTerrace().catch((err: Error) => console.error('Validator error:', err));
