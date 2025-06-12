@@ -91,56 +91,53 @@ export const createUser = async (req: Request) => {
 };
 
 //--------------------------------------------------------
+export const updateUser = async (req: Request, res: Response) => {
+    const authenticatedUserId = req.user?.id;
+    const userIdToUpdate = req.params.id;
+    const { password_hash, name, birth_date, newPassword, claimRestaurant } = req.body; 
 
-export const updateUser = async (
-  email: string,
-  currentPassword: string,
-  req: Request,
-  res: Response
-) => {
-  const updateData = req.body;
-  try {
-    const user = await User.findOne({ where: { email: email } });
-    if (!user) {
-      throw new Error("❌ User not found");
-    }
+    try {
+        
+        if (authenticatedUserId !== userIdToUpdate ) {
+            return res.status(403).json({ error: "Access denied. You don't have permission to modify this profile." });
+        }
 
-    const isPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password_hash
-    );
-    if (!isPasswordValid) {
-      throw new Error("❌ Invalid password");
-    }
-    if (updateData.name) {
-      user.name = updateData.name;
-    }
-    if (updateData.birthdate) {
-      user.birth_date = updateData.birthdate;
-    }
-    if (updateData.newPassword) {
-      user.password_hash = await bcrypt.hash(updateData.newPassword, 10);
-    }
-    if (updateData.claimRestaurant && user.role === "client") {
-      user.role = "owner";
-    }
-    await user.save();
-    return user;
-  } catch (error) {
- 
-    if (error.name === "ZodError") {
-      return res.status(500).json({
-        error: "❌ Error updating user",
-        details: error.errors,
-      });
-    }
+        const user = await User.findByPk(userIdToUpdate);
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
 
-    console.error(`❌ Error updating user:`, error);
-    return res.status(500).json({
-      error: "Error updating user",
-      message: error.message,
-    });
-  }
+        
+        const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Invalid password" });
+        }
+
+        
+        if (name) {
+            user.name = name;
+        }
+        if (birth_date) {
+            user.birth_date = birth_date;
+        }
+        if (newPassword) {
+            user.password_hash = await bcrypt.hash(newPassword, 10);
+        }
+        if (claimRestaurant && user.role === 'client') {
+            user.role = 'owner';
+        }
+
+        await user.save();
+     
+        const updatedUser = user.toJSON();
+        delete updatedUser.password_hash; 
+        return res.status(200).json(updatedUser);
+
+    } catch (error: any) {
+        console.error(`❌ Error updating user profile ${userIdToUpdate}:`, error);
+      
+        return res.status(500).json({ error:"Server error" });
+    }
 };
 
 //---------------------------------------------------------*****--------------//
