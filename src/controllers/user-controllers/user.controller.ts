@@ -146,30 +146,39 @@ export const updateUser = async (
 //---------------------------------------------------------*****--------------//
 
 
-export const deleteUser = async (email: string, password_hash: string, req: Request, res:Response) => {
-    try {
-        const user = await User.findOne({ where: { email: email } });
-    if (!user) {
-        return res.status(400).json({ error: "Invalid or nonexistent user ID" });
-    }
-    const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash);
-    if (!isPasswordValid) {
-        return res.status(400).json({ error: "Invalid password" });
-    }
-    await user.destroy();
-    res.sendStatus(200);
-    } catch (error: any) {
-    console.error(`Error deleting user ${email}: ${error}`);
+export const deleteUser = async (req: Request, res:Response) => {
+  const authenticatedUserId = req.user?.id;
+  const userIdToDelete = req.params.id;
+    const { password_hash } = req.body;
 
-    if (error.name === "ZodError") {
-      return res
-        .status(500)
-        .json({
-          error: "❌ Error deleting user",
-          email,
-          details: error.errors,
-        });
+    try {
+        
+        if (authenticatedUserId !== userIdToDelete) { 
+             return res.status(403).json({ error: "Access denied. You don't have permission to delete this account." });
+        }
+
+
+        const user = await User.findByPk(userIdToDelete); 
+        if (!user) {
+            return res.status(404).json({ error: "User not found." }); 
+        }
+
+        const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash); // 
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Invalid password." });
+        }
+
+        await user.destroy();
+        return res.status(200).json({ message: 'Profile deleted' });
+
+    } catch (error: any) {
+        console.error(`❌ Error deleting user ${userIdToDelete}:`, error);
+
+        if (error.name === "SequelizeForeignKeyConstraintError") {
+             return res.status(400).json({ error: "No se puede eliminar el usuario. Existen reservas o restaurantes asociados.", details: error.message });
+        }
+        return res.status(500).json({ error: "Error interno del servidor al eliminar el usuario." });
     }
-    console.error(`❌ Error deleting user:`, error);
-    return res.status(500).json({ error: "Error deleting user" });
-  }}
+};
+
+  
