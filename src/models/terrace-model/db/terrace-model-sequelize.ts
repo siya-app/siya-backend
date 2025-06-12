@@ -6,13 +6,11 @@ import {defaultOpeningHours} from '../../../utils/terrace-utils/defaultOpeningHo
 import { UUID } from 'crypto';
 //TODO find default images!!
 
-class Terrace extends Model {
+export class Terrace extends Model {
     public id!: UUID;
     public business_name!: string;
     public cadastro_ref!: string;
-    public street_type!: string;
-    public street_address!: string;
-    public door_address!: number;
+    public address!: string;
     public activity_code!: number;
     public group_activity_code!: number;
     public district_name!: string;
@@ -53,6 +51,7 @@ Terrace.init({
     cadastro_ref: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true
     },
     address: {
         type: DataTypes.STRING,
@@ -95,11 +94,11 @@ Terrace.init({
         allowNull: false,
     },
     latitude: {
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
     longitude: {
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
     average_price: {
@@ -159,15 +158,9 @@ Terrace.init({
         sequelize,
         modelName: 'Terrace',
         tableName: 'terraces',
+        schema: 'public',
         timestamps: false,
     }
 );
 
 export default Terrace;
-
-// has_promos
-// reservation_fee
-// is_premium
-// is_verified
-// instagram_account
-
