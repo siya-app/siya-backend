@@ -18,6 +18,12 @@ console.log('Environment loaded:', {
     apiUrl1: process.env.BUSINESS_API_URL,
     apiUrl2: process.env.TERRACE_API_URL
 });
+// JWT
+import dotenv from 'dotenv';
+dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretdefaultkey';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+
 
 // listens to silent errors
 process.on('uncaughtException', (err) => {
