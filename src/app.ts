@@ -1,7 +1,4 @@
-
-// console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
-// import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
 import morgan from 'morgan'
 import uploadRoutes from './routes/upload-routes/upload.route.js'
@@ -25,26 +22,6 @@ process.on('uncaughtException', (err) => {
     process.exit(1);
 });
 
-//!
-//! DO NOT TOUCH or UNCOMMENT
-// this function ERASES everything from the database, useful by the moment
-// for testing objects, will delete it asap
-// async function start() {
-//     try {
-//         await sequelize.sync({ force: true }); // force: true drops & recreates tables
-//         console.log("Database synced (tables recreated).");
-
-//         app.listen(port, () => {
-//             console.log(`Server listening on port ${port}`);
-//         });
-//     } catch (error) {
-//         console.error("Error syncing database:", error);
-//     }
-// }
-
-// start();
-//!
-//!
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -84,7 +61,6 @@ app.get('/', (req, res) => {
     //esto devuelve la respuesta que le da el controller
     // el controller debe manejar la estructura de la respuesta
     // la ruta es el trigger desde el frontend
-    // probar ruta con postman
     res.send('mi api!');
 });
 
