@@ -1,9 +1,12 @@
 import { Router } from 'express';
-import { createUser } from '../../controllers/user-controllers/user.controller.js';
-import { createNewTerrace, deleteTerrace, getAllTerraces, getTerraceById, updateTerrace } from '../../controllers/terrace-controllers/terrace.controller.js';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser } from '../../controllers/user-controllers/user.controller.js';
+
 
 const router = Router();
-
+router.get('/users', getAllUsers);
+router.get('/users/:id', getUserById);
 router.post('/users', createUser);
+router.put('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 
 export default router;
