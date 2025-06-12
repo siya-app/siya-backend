@@ -45,6 +45,18 @@ User.init(
     type: DataTypes.ENUM('client', 'owner'), 
     defaultValue: 'client',
     allowNull: false,
+  },
+  id_terrace: {
+    type: DataTypes.UUID, 
+    allowNull: true, 
+    unique: true, 
+    references: {
+      model: 'terraces',
+      key: 'id',
+    },
+    
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
   }
   },
   {

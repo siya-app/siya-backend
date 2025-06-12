@@ -11,6 +11,7 @@ import userRoutes from './routes/user-routes/user.routes.js'
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
 import { sequelize } from './config/sequelize-config.js';
 import paymentRoutes from "./routes/payment-routes/payment.route.js"
+import './models/associations/associations.js'
 
 console.log('--- STARTUP TEST LOG ---');
 
