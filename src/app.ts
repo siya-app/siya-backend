@@ -69,5 +69,5 @@ app.listen(port, () => {
     
 });
 
-console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch((err: Error) => console.error('Validator error:', err));
+// Runs at --> 2:30 AM on the 1st day of the month every 3 months
+cronFetch('30 2 1 */3 *').catch((err: Error) => console.error('Cron error:', err));
