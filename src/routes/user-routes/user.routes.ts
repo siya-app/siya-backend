@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createUser, getAllUsers, getUserByEmailOrId, updateUser, deleteUser } from '../../controllers/user-controllers/user.controller.js';
-import { authenticateToken, authorizeRoles } from '../../middleware/auth.middleware.js';
+import { authenticateToken} from '../../middleware/auth.middleware.js';
 import { loginUser } from '../../controllers/auth-controller/auth.controller.js';
 
 

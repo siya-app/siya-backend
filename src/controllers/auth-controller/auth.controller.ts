@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET_STRING = process.env.JWT_SECRET || 'supersecretdefaultkey';
 const JWT_SECRET = Buffer.from(JWT_SECRET_STRING, 'utf8');
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+const JWT_EXPIRES_IN = '1d';
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
@@ -41,7 +41,7 @@ export const loginUser = async (req: Request, res: Response) => {
       },
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error(`❌ Error logging in user:`, error);
     return res.status(500).json({ error: 'Error signing in.' });
   }

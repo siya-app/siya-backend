@@ -9,7 +9,7 @@ import { createCustomValidatedTerrace } from './controllers/terrace-controllers/
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
-import { sequelize } from './config/sequelize-config.js';
+//import { sequelize } from './config/sequelize-config.js';
 import paymentRoutes from "./routes/payment-routes/payment.route.js"
 import './models/associations/associations.js'
 
@@ -20,11 +20,13 @@ console.log('Environment loaded:', {
     apiUrl2: process.env.TERRACE_API_URL
 });
 // JWT
-import dotenv from 'dotenv';
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretdefaultkey';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+// const JWT_SECRET_STRING = process.env.JWT_SECRET || 'supersecretdefaultkey';
+// const JWT_SECRET = Buffer.from(JWT_SECRET_STRING, 'utf8');
+// const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
+// const JWT_SECRET_STRING="a6DP1zgRA27o2g7fOerq";
+// const JWT_SECRET = Buffer.from(JWT_SECRET_STRING, 'utf8');
+// const JWT_EXPIRES_IN = '1d';
 
 // listens to silent errors
 process.on('uncaughtException', (err) => {
