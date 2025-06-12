@@ -68,11 +68,14 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
-    
+    assignRandomImagesToTerraces()
+        .then(() => console.log('🖼 Random images assigned to terraces'))
+        .catch(err => console.error('❌ Failed to assign images:', err));
 });
 
-try {
-    cronFetch('30 2 1 */3 *')
-} catch (err) {
-    console.error(`Error triggering cron, ${err}`)
-}
+// try {
+//     cronFetch('30 2 1 */3 *')
+// } catch (err) {
+//     console.error(`Error triggering cron, ${err}`)
+// }
+
