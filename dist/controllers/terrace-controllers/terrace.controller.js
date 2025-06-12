@@ -1,4 +1,5 @@
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
+import { CustomTerraceSchema } from '../../models/terrace-model/zod/customTerrace-schema.js';
 // http://localhost:8080/terraces
 // GET ALL items
 export const getAllTerraces = async (req, res) => {
@@ -8,8 +9,12 @@ export const getAllTerraces = async (req, res) => {
         res.status(200);
     }
     catch (error) {
-        console.log(`Error fetching terraces: error ${error}`);
-        res.status(500).json({ error: "Error fetching terraces" });
+        console.error(`Error fetching terraces: error ${error}`);
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error fetching terraces", details: error.errors });
+        }
+        console.error(`❌ Error fetching terraces:`, error);
+        return res.status(500).json({ error: "Error fetching terraces" });
     }
 };
 // http://localhost:8080/terraces/id
@@ -21,56 +26,88 @@ export const getTerraceById = async (req, res) => {
         return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
     }
     try {
-        const terrace = await Terrace.findOne({ where: { id: terraceID } });
+        const terrace = await Terrace.findByPk(terraceID);
+        // const terrace = await Terrace.findOne({ where: { id: terraceID } });
         if (!terrace) {
             return res.status(404).json({ error: "Terrace ID- not found" });
         }
         res.status(200).json(terrace);
     }
     catch (error) {
-        console.log(`Error fetching terrace ID-${terraceID}: error ${error}`);
-        res.status(500).json({ error: "Error fetching terrace" });
+        console.error(`Error fetching terrace ID-${terraceID}: error ${error}`);
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error fetching terrace", details: error.errors });
+        }
+        console.error(`❌ Error fetching terrace:`, error);
+        return res.status(500).json({ error: "Error fetching terrace" });
     }
 };
 // http://localhost:8080/terraces
 // POST items
 export const createNewTerrace = async (req, res) => {
-    const terraceData = req.body;
-    console.log("💡 terraceData:", terraceData);
-    if (!terraceData || !terraceData.id) {
-        return res.status(400).json({ error: "Invalid or inexistent terrace data" });
-    }
     try {
+        const terraceData = CustomTerraceSchema.parse(req.body);
+        if (!terraceData) {
+            return res.status(204).json({ error: "Invalid or inexistent terrace" });
+        }
+        console.warn("💡 terraceData validated:", terraceData);
         const createdTerrace = await Terrace.create(terraceData);
-        res.status(201).json(createdTerrace);
+        return res.status(201).json(createdTerrace);
     }
     catch (error) {
-        console.error(`Error adding terrace: error ${error}`);
-        res.status(500).json({ error: "Error adding terrace" });
+        if (error.name === "ZodError") {
+            console.error("🔥 FULL ERROR:", error);
+            return res.status(400).json({ error: "❌ Validation failed", details: error.errors });
+        }
+        console.error(`❌ Error adding terrace:`, error);
+        return res.status(500).json({ error: "Error adding terrace" });
     }
 };
 // http://localhost:8080/terraces/id
 // PUT items/:id
 export const updateTerrace = async (req, res) => {
-    const terraceID = parseInt(req.params.id, 10);
-    const { terrace } = req.body;
-    if (typeof terrace !== "string" || terrace.trim() === "") {
-        return res.status(400).json({ err: "Invalid or inexistent terrace data" });
+    const terraceID = req.params.id;
+    const updateData = req.body; // Assuming the update data is sent in the request body
+    if (!terraceID) {
+        return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
+    }
+    if (!updateData || Object.keys(updateData).length === 0) {
+        return res.status(400).json({ error: "No update data provided" });
     }
     try {
-        await Terrace.update({ terrace }, { where: { id: terraceID } });
-        res.sendStatus(200);
+        const [updatedRows] = await Terrace.update(updateData, {
+            where: { id: terraceID }
+        });
+        if (updatedRows === 0) {
+            return res.status(404).json({ error: "Terrace not found or no changes made" });
+        }
+        res.status(200).json({
+            message: "Terrace updated successfully",
+            terraceID,
+            updatedFields: updateData
+        });
     }
     catch (error) {
         console.error(`Error updating terrace ID-${terraceID}: ${error}`);
-        res.status(500).json({ error: "Error updating terrace" });
+        if (error.name === 'ZodError') {
+            return res.status(500).json({
+                error: "❌ Error updating terrace",
+                terraceID,
+                details: error.errors
+            });
+        }
+        console.error(`❌ Error updating terrace:`, error);
+        return res.status(500).json({
+            error: "Error updating terrace",
+            message: error.message
+        });
     }
 };
 // http://localhost:8080/terraces
 // DELETE items/:id
 export const deleteTerrace = async (req, res) => {
-    const terraceID = parseInt(req.params.id, 10);
-    if (isNaN(terraceID) || !terraceID) {
+    const terraceID = req.params.id;
+    if (!terraceID) {
         return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
     }
     try {
@@ -79,7 +116,11 @@ export const deleteTerrace = async (req, res) => {
     }
     catch (error) {
         console.error(`Error deleting terrace ID-${terraceID}: ${error}`);
-        res.status(500).json({ error: "Error deleting terrace", terraceID });
+        if (error.name === 'ZodError') {
+            return res.status(500).json({ error: "❌ Error deleting terrace", terraceID, details: error.errors });
+        }
+        console.error(`❌ Error adding terrace:`, error);
+        return res.status(500).json({ error: "Error deleting terrace" });
     }
 };
 //# sourceMappingURL=terrace.controller.js.map

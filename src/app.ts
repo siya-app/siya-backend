@@ -1,17 +1,20 @@
-
-console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
-// import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
 import morgan from 'morgan'
 import uploadRoutes from './routes/upload-routes/upload.route.js'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
+<<<<<<< HEAD
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
 //import { sequelize } from './config/sequelize-config.js';
 import paymentRoutes from "./routes/payment-routes/payment.route.js"
 import './models/associations/associations.js'
+=======
+import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
+import { sequelize } from './config/sequelize-config.js';
+import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
+>>>>>>> develop
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -34,26 +37,6 @@ process.on('uncaughtException', (err) => {
     process.exit(1);
 });
 
-//!
-//! DO NOT TOUCH or UNCOMMENT
-// this function ERASES everything from the database, useful by the moment
-// for testing objects, will delete it asap
-// async function start() {
-//     try {
-//         await sequelize.sync({ force: true }); // force: true drops & recreates tables
-//         console.log("Database synced (tables recreated).");
-
-//         app.listen(port, () => {
-//             console.log(`Server listening on port ${port}`);
-//         });
-//     } catch (error) {
-//         console.error("Error syncing database:", error);
-//     }
-// }
-
-// start();
-//!
-//!
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -61,7 +44,7 @@ const port = process.env.PORT || 8080;
 app.use(morgan('dev'))
 
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    // // console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
@@ -81,9 +64,10 @@ app.use(express.urlencoded({ extended: true, limit:"50mb" })); // For form data
 // api routes here
 app.use('/',userRoutes);
 app.use('/', terraceRoutes);
-app.use("/", bookingRoutes )
-
-app.use("/", paymentRoutes);
+//! missing
+// app.use('/', bookingRoutes)
+//! missing
+// app.use('/', paymentRoutes)
 app.use('/', uploadRoutes)
 
 // middleware -->
@@ -94,13 +78,19 @@ app.get('/', (req, res) => {
     //esto devuelve la respuesta que le da el controller
     // el controller debe manejar la estructura de la respuesta
     // la ruta es el trigger desde el frontend
-    // probar ruta con postman
     res.send('mi api!');
 });
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
+    assignRandomImagesToTerraces()
+        .then(() => console.log('🖼 Random images assigned to terraces'))
+        .catch(err => console.error('❌ Failed to assign images:', err));
 });
 
-console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch(err => console.error('Validator error:', err));
+// try {
+//     cronFetch('30 2 1 */3 *')
+// } catch (err) {
+//     console.error(`Error triggering cron, ${err}`)
+// }
+

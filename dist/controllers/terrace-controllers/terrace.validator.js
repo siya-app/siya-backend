@@ -4,37 +4,42 @@ import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
 import { createCustomTerrace } from "./validators/createCustomTerrace.js";
 // import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
 // import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+const customTerracesData = [];
 export async function createCustomValidatedTerrace() {
     const { businesses, terraces } = await fetchAllDataFromApis();
     let customTerraces = [];
     const unmatchedTerraces = [];
     for (let i = 0; i < terraces.length; i++) {
         const terrace = terraces[i];
-        let matchingRestaurants = matchByCoords(terrace, businesses);
-        // if(matchingRestaurants !== null ) console.warn(matchingRestaurants[0])
-        if (!matchingRestaurants || matchingRestaurants.length === 0) {
+        let matchingBusinesses = matchByCoords(terrace, businesses);
+        console.warn(`matchingBusinesses after matchByCoords --> ${matchingBusinesses}`);
+        // if(matchingBusinesses !== null ) console.warn(matchingBusinesses[0])
+        if (!matchingBusinesses || matchingBusinesses.length === 0) {
             // No coords match → add to unmatched for manual review
             unmatchedTerraces.push(terrace);
             console.warn(`no match with coords, trying matching by address`);
             continue;
         }
-        if (matchingRestaurants.length === 1) {
+        if (matchingBusinesses.length === 1) {
             // Only one match by coords → create directly
             // find index but how - increment index dynamically
-            const custom = createCustomTerrace(terrace, matchingRestaurants[(0)]);
-            matchingRestaurants = [];
+            const custom = createCustomTerrace(terrace, matchingBusinesses[(0)]);
+            console.warn(`customterrace to create --> ${custom}`);
             customTerraces.push(custom);
+            matchingBusinesses = [];
             continue;
         }
         else {
-            const { validMatches, invalidMatches } = matchByCoordsAndAddress(terrace, matchingRestaurants) || {};
+            const { validMatches, invalidMatches } = matchByCoordsAndAddress(terrace, matchingBusinesses) || {};
             if (!validMatches || validMatches.length !== 1) {
-                console.warn(terrace);
+                console.error(`terrace goes to unmatchedTerraces --> ${terrace}`);
                 unmatchedTerraces.push(terrace);
-                matchingRestaurants = [];
+                matchingBusinesses = [];
             }
             else {
-                // const custom = createCustomTerrace(terrace, validMatches[i]);
+                const custom = createCustomTerrace(terrace, validMatches[i]);
+                console.warn(`custom match --> ${custom}`);
+                customTerracesData.push(custom);
                 // console.log(`custom -> ${custom}, validMatches[i] -> ${validMatches[i]}`)
                 // customTerraces.push(custom);
                 console.warn(`here we would create a terrace if it is a valid match`);
@@ -43,6 +48,8 @@ export async function createCustomValidatedTerrace() {
     }
     try {
         if (customTerraces.length > 0) {
+            customTerracesData.push(customTerraces);
+            console.warn(`here we would bulkCreate terraces`);
             // await Terrace.bulkCreate(customTerraces, {
             //     updateOnDuplicate: [
             //         'business_name',
