@@ -3,7 +3,7 @@ import User from "../../models/user-model/user.model.js";
 import { userSchema } from "../../models/user-model/zod/user.schema.js";
 import { log } from "console";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
