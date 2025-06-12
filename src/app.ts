@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
+import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
 
 console.log('Environment loaded:', {
     apiUrl1: process.env.BUSINESS_API_URL,
@@ -59,4 +60,4 @@ app.listen(port, () => {
 });
 
 console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch((err: Error) => console.error('Validator error:', err));
+assignRandomImagesToTerraces().catch((err: Error) => console.error('Validator error:', err));
