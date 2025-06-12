@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
+import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
 
 console.log('Environment loaded:', {
     apiUrl1: process.env.BUSINESS_API_URL,
@@ -58,5 +59,5 @@ app.listen(port, () => {
     
 });
 
-console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch((err: Error) => console.error('Validator error:', err));
+// Runs at --> 2:30 AM on the 1st day of the month every 3 months
+cronFetch('30 2 1 */3 *').catch((err: Error) => console.error('Cron error:', err));
