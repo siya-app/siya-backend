@@ -1,21 +1,11 @@
 import { fetchAllDataFromApis } from "../../services/terrace-services/all.data.service.js";
 import { matchByCoords } from "./validators/coordsValidator.js";
-// import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
-import { createCustomTerrace } from "./validators/createCustomTerrace.js";
 import { createOrUpdateTerrace } from "./validators/createOrUpdateTerrace.js";
 import type { TerraceApiType } from "../../models/terrace-model/zod/terrace-schema.js";
-import { CustomTerraceType } from "../../models/terrace-model/zod/customTerrace-schema.js";
-import { match } from "assert";
 import { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
-import { readJsonArray } from "../../utils/terrace-utils/readJson.js";
-// import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
-import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+// import { readJsonArray } from "../../utils/terrace-utils/readJson.js";
 
 const customTerracesData: any[] = [];
-// let businesses: BusinessApiType[] = [];
-// let terraces: TerraceApiType[] = [];
-// let fullBusinesses: BusinessApiType[] = [];
-// let fullTerraces: TerraceApiType[] = [];
 let uniqueBusinesses: BusinessApiType[] = [];
 let count = 0;
 

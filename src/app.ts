@@ -1,18 +1,10 @@
-
-// console.log("✅ ENV loaded:", process.env.BUSINESS_API_URL);
 import express from 'express';
-// import { sequelize } from './config/sequelize-config.js';
 import cors from 'cors';
 import morgan from 'morgan'
 
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
-import { sequelize } from './config/sequelize-config.js';
-import { fetchAllBusinessPages } from './services/terrace-services/apiBusinessPagination.js';
-import { fetchAllTerracePages } from './services/terrace-services/apiTerracePagination.js';
-
-// console.log('--- STARTUP TEST LOG ---');
 
 console.log('Environment loaded:', {
     apiUrl1: process.env.BUSINESS_API_URL,
@@ -25,26 +17,6 @@ process.on('uncaughtException', (err) => {
     process.exit(1);
 });
 
-//!
-//! DO NOT TOUCH or UNCOMMENT
-// this function ERASES everything from the database, useful by the moment
-// for testing objects, will delete it asap
-// async function start() {
-//     try {
-//         await sequelize.sync({ force: true }); // force: true drops & recreates tables
-//         console.log("Database synced (tables recreated).");
-
-//         app.listen(port, () => {
-//             console.log(`Server listening on port ${port}`);
-//         });
-//     } catch (error) {
-//         console.error("Error syncing database:", error);
-//     }
-// }
-
-// start();
-//!
-//!
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -78,7 +50,6 @@ app.get('/', (req, res) => {
     //esto devuelve la respuesta que le da el controller
     // el controller debe manejar la estructura de la respuesta
     // la ruta es el trigger desde el frontend
-    // probar ruta con postman
     res.send('mi api!');
 });
 

@@ -25,7 +25,6 @@ export async function fetchDataTerraces(): Promise<TerraceApiType[]> {
             return [];
         }
 
-        console.log("✅🍸 Received data from api terraces,", "records.length", records.length, "total length:", totalLength);
         return records;
 
     } catch (error) {
