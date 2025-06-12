@@ -71,9 +71,6 @@ app.listen(port, () => {
     
 });
 
-console.log('--- DEBUG: About to call terraceValidator ---');
-createCustomValidatedTerrace().catch((err: Error) => console.error('Validator error:', err));
-
 try {
     cronFetch('30 2 1 */3 *')
 } catch (err) {
