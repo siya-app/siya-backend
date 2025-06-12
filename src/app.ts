@@ -8,9 +8,10 @@ import uploadRoutes from './routes/upload-routes/upload.route.js'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
-import { sequelize } from './config/sequelize-config.js';
-import paymentRoutes from "./routes/payment-routes/payment.route.js"
+/* import { sequelize } from './config/sequelize-config.js';
+ */import paymentRoutes from "./routes/payment-routes/payment.route.js"
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
+import fakeDataRoutes from './routes/fake-data.routes.js'; // Assuming you have a fakeDataRouter defined
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -75,6 +76,7 @@ app.use('/', terraceRoutes);
 app.use('/', bookingRoutes)
 app.use('/', paymentRoutes)
 app.use('/', uploadRoutes)
+app.use('/api', fakeDataRoutes); // Assuming you have a fakeDataRouter defined
 
 // middleware -->
 // app.use(notFound);
