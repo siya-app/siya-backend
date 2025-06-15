@@ -8,6 +8,8 @@ import userRoutes from './routes/user-routes/user.routes.js'
 import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
 import { sequelize } from './config/sequelize-config.js';
 import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
+import bookingRoutes from './routes/booking-routes/booking.routes.js'
+import paymentRoutes from './routes/payment-routes/payment.route.js'
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -34,7 +36,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow only your frontend // 5173 for vite app
+    origin: ['http://localhost:5173', 'http://localhost:4200'], // Allow only your frontend // 5173 for vite app
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
     credentials: true // If cookies/auth headers needed!
     //TODO take a look at middleware headers auth
@@ -50,9 +52,10 @@ app.use(express.urlencoded({ extended: true, limit:"50mb" })); // For form data
 app.use('/',userRoutes);
 app.use('/', terraceRoutes);
 //! missing
-// app.use('/', bookingRoutes)
+
+app.use('/', bookingRoutes)
 //! missing
-// app.use('/', paymentRoutes)
+ app.use('/', paymentRoutes)
 app.use('/', uploadRoutes)
 
 // middleware -->
@@ -68,9 +71,9 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
-    assignRandomImagesToTerraces()
-        .then(() => console.log('🖼 Random images assigned to terraces'))
-        .catch(err => console.error('❌ Failed to assign images:', err));
+    // assignRandomImagesToTerraces()
+    //     .then(() => console.log('🖼 Random images assigned to terraces'))
+    //     .catch(err => console.error('❌ Failed to assign images:', err));
 });
 
 // try {
