@@ -9,7 +9,7 @@ import bookingRoutes from './routes/booking-routes/booking.routes.js'
 //import { sequelize } from './config/sequelize-config.js';
 import paymentRoutes from "./routes/payment-routes/payment.route.js"
 import './models/associations/associations.js'
-import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
+//import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
 import { sequelize } from './config/sequelize-config.js';
 import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
 
@@ -48,8 +48,9 @@ app.use((req, res, next) => {
 app.use(cors({
     origin: 'http://localhost:5173', // Allow only your frontend // 5173 for vite app
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
-    credentials: true // If cookies/auth headers needed!
+    credentials: true, // If cookies/auth headers needed!
     //TODO take a look at middleware headers auth
+   
 }));
 
 
@@ -57,6 +58,7 @@ app.use(cors({
 //This middleware parses incoming JSON data from the request body, limit 50mb for saving space
 app.use(express.json({limit:"50mb"}));
 app.use(express.urlencoded({ extended: true, limit:"50mb" })); // For form data
+
 
 // api routes here
 app.use('/',userRoutes);
@@ -77,12 +79,12 @@ app.get('/', (req, res) => {
     // la ruta es el trigger desde el frontend
     res.send('mi api!');
 });
-
+//Descomentar luego
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
-    assignRandomImagesToTerraces()
-        .then(() => console.log('🖼 Random images assigned to terraces'))
-        .catch(err => console.error('❌ Failed to assign images:', err));
+//     assignRandomImagesToTerraces()
+//         .then(() => console.log('🖼 Random images assigned to terraces'))
+//         .catch(err => console.error('❌ Failed to assign images:', err));
 });
 
 // try {
@@ -91,3 +93,15 @@ app.listen(port, () => {
 //     console.error(`Error triggering cron, ${err}`)
 // }
 
+import jwt from "jsonwebtoken";
+import { Request, Response } from 'express';
+export function isTokenValid  (req: Request, res: Response) {
+    try{
+        const token = req.headers.authorization.split(" ")[1]
+        const payload = jwt.verify(token, process.env.TOKEN_SECRET)
+        req.payload = payload
+
+    }catch{
+        res.status(401).json({errormessage: "Invalid token"})
+    }
+}

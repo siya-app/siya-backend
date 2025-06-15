@@ -70,7 +70,7 @@ export const createUser = async (req: Request) => {
     const { name, email, password_hash, birth_date, role } = userSchema.parse(
       req.params
     );
-
+    console.log("Datos recibidos en el backend:", req.body); 
     const hashedPassword = await bcrypt.hash(password_hash, 10);
 
     const newUser = await User.create({

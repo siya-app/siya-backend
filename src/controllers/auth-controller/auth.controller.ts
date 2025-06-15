@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../../models/user-model/user.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import {isTokenValid} from '../../app.js'
 
 const JWT_SECRET_STRING = process.env.JWT_SECRET || 'supersecretdefaultkey';
 const JWT_SECRET = Buffer.from(JWT_SECRET_STRING, 'utf8');

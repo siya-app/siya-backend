@@ -44,7 +44,7 @@ User.init(
     role: {
     type: DataTypes.ENUM('client', 'owner'), 
     defaultValue: 'client',
-    allowNull: false,
+    //allowNull: false,
   },
   id_terrace: {
     type: DataTypes.UUID, 
