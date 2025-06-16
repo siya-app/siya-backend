@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow only your frontend // 5173 for vite app
+    origin: 'http://localhost:5174', // Allow only your frontend // 5173 for vite app
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
     credentials: true // If cookies/auth headers needed!
     //TODO take a look at middleware headers auth
@@ -68,14 +68,14 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
-    assignRandomImagesToTerraces()
-        .then(() => console.log('🖼 Random images assigned to terraces'))
-        .catch(err => console.error('❌ Failed to assign images:', err));
+    // assignRandomImagesToTerraces()
+    //     .then(() => console.log('🖼 Random images assigned to terraces'))
+    //     .catch(err => console.error('❌ Failed to assign images:', err));
 });
 
-// try {
-//     cronFetch('30 2 1 */3 *')
-// } catch (err) {
-//     console.error(`Error triggering cron, ${err}`)
-// }
+try {
+    cronFetch('30 2 1 */3 *')
+} catch (err) {
+    console.error(`Error triggering cron, ${err}`);
+}
 
