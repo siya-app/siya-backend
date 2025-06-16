@@ -4,34 +4,77 @@ import { bookingSchema } from "../../models/booking-model/zod/booking.schema.js"
 import { Request, Response } from "express";
 import { existsSync } from "fs";
 import { error } from "console";
+import { AuthenticatedRequest } from "../../middleware/auth.middleware.js";
+
 
 
 //this is a Post Route
 //http://localhost:8080/booking
-export const createBooking = async (req:Request, res:Response)=>{
-    try {
-        const validateData=bookingSchema.parse(req.body)
+// export const createBooking = async (req:AuthenticatedRequest, res:Response)=>{
+//      try {
+//     const validateData = bookingSchema.parse(req.body)
 
-        const booking_price=validateData.booking_price??validateData.party_length * 1
+//     const userIdFromToken = req.user?.id // 👈 este ID viene del token
 
-        if (isNaN(booking_price) || booking_price <= 0) {
-         throw new Error("Booking price must be a positive number");
-        }
+//     if (!userIdFromToken) {
+//       return res.status(401).json({ error: "User not authenticated" })
+//     }
 
-        const newBooking=await Booking.create({
-            ...validateData,
-            booking_price,
-            is_paid: validateData.is_paid??false
-        })
-        return res.status(201).json(newBooking)
-    } catch (error:any) {
-        if (error instanceof ZodError){
-            return res.status(400).json({error: "validation goes wrong", details: error.errors})
-        }
-        console.error(" Error creating booking:", error)
-        return res.status(500).json({ error: "Internal server error" })
+//     const booking_price = validateData.booking_price ?? validateData.party_length * 1
+
+//     if (isNaN(booking_price) || booking_price <= 0) {
+//       throw new Error("Booking price must be a positive number")
+//     }
+
+//     const newBooking = await Booking.create({
+//       ...validateData,
+//       user_id: userIdFromToken, // 👈 Asigna el user_id aquí
+//       booking_price,
+//       is_paid: validateData.is_paid ?? false,
+//     })
+
+//     return res.status(201).json(newBooking)
+//   } catch (error: any) {
+//     if (error instanceof ZodError) {
+//       return res.status(400).json({ error: "Validation failed", details: error.errors })
+//     }
+//     console.error("Error creating booking:", error)
+//     return res.status(500).json({ error: "Internal server error" })
+//   }
+// }
+export const createBooking = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const validateData = bookingSchema.parse(req.body);
+
+    const userIdFromToken = req.user?.id;
+
+    if (!userIdFromToken) {
+      return res.status(401).json({ error: "User not authenticated" });
     }
-}
+
+    if (!validateData.terrace_id) {
+      return res.status(400).json({ error: "Terrace ID is required" });
+    }
+
+    const booking_price = validateData.booking_price ?? validateData.party_length * 1;
+
+    const newBooking = await Booking.create({
+      ...validateData,
+      user_id: userIdFromToken, // 🔐 solo del token
+      booking_price,
+      is_paid: validateData.is_paid ?? false,
+    });
+
+    return res.status(201).json(newBooking);
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({ error: "Validation failed", details: error.errors });
+    }
+    console.error("Error creating booking:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 // this is a Put Route
 //http://localhost:8080/booking/{booking_id}
