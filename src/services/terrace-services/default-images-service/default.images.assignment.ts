@@ -1,7 +1,7 @@
 import Terrace from "../../../models/terrace-model/db/terrace-model-sequelize.js";
 import { getRandomTerraceImage } from "./default.images.service.js";
 
-export async function assignRandomImagesToTerraces() {
+/* export async function assignRandomImagesToTerraces() {
     let processedCount = 0;
 
     try {
@@ -20,4 +20,4 @@ export async function assignRandomImagesToTerraces() {
     } catch (error) {
         console.error('Error in image assignment:', error);
     }
-}
+} */

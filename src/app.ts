@@ -2,12 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan'
 import uploadRoutes from './routes/upload-routes/upload.route.js'
-import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
-import terraceRoutes from './routes/terrace-routes/terraces.router.js';
+/* import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
+ */import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import userRoutes from './routes/user-routes/user.routes.js'
-import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
-import { sequelize } from './config/sequelize-config.js';
-import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
+//import { assignRandomImagesToTerraces } from './services/terrace-services/default-images-service/default.images.assignment.js';
+/* import { sequelize } from './config/sequelize-config.js';
+import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js'; */
 
 console.log('--- STARTUP TEST LOG ---');
 
@@ -54,7 +54,7 @@ app.use('/', terraceRoutes);
 //! missing
 // app.use('/', paymentRoutes)
 app.use('/', uploadRoutes)
-app.use('/api', fakeDataRoutes); // Assuming you have a fakeDataRouter defined
+//app.use('/api', fakeDataRoutes); // Assuming you have a fakeDataRouter defined
 
 // middleware -->
 // app.use(notFound);
@@ -69,9 +69,9 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Express is listening at http://localhost:${port} 🤍`);
-    assignRandomImagesToTerraces()
+   /*  assignRandomImagesToTerraces()
         .then(() => console.log('🖼 Random images assigned to terraces'))
-        .catch(err => console.error('❌ Failed to assign images:', err));
+        .catch(err => console.error('❌ Failed to assign images:', err)); */
 });
 
 // try {
