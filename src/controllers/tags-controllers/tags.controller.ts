@@ -89,8 +89,6 @@ export const getTerraceTags = async (req: Request, res: Response) => {
     }
 };
 
-
-
 // http://localhost:8080/terraces/id/tags
 // PUT /terraces/:id/tags
 // export const updateTerraceTags = async (req: Request, res: Response) => {

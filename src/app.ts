@@ -68,7 +68,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" })); // For form data
 app.use('/', userRoutes);
 app.use('/', terraceRoutes);
 
-app.use('/',authRoutes)
+app.use('/', authRoutes)
 app.use('/reviews', reviewRoutes);
 app.use("/", tagsRouter);
 
@@ -119,11 +119,11 @@ const startServer = async () => {
 };
 
 startServer();
-// try {
-//     cronFetch('30 2 1 */3 *')
-// } catch (err) {
-//     console.error(`Error triggering cron, ${err}`)
-// }
+try {
+    cronFetch('30 2 1 */3 *')
+} catch (err) {
+    console.error(`Error triggering cron, ${err}`)
+}
 
 // import { Request, Response, NextFunction } from 'express';
 // import jwt from 'jsonwebtoken';
