@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createUser, getAllUsers, getUserByEmailOrId, updateUser, deleteUser , getLoggedInUserProfile} from '../../controllers/user-controllers/user.controller.js';
+import { createUser, getAllUsers, getUserByEmailOrId, updateUser, deleteUser , getLoggedInUserProfile, claimTerraceOwnership} from '../../controllers/user-controllers/user.controller.js';
 import { isTokenValid } from '../../middleware/auth.middleware.js'; // ✅ Importación corregida para el middleware
 import { loginUser } from '../../controllers/auth-controller/auth.controller.js';
 
