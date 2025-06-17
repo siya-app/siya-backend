@@ -9,8 +9,8 @@ export const userSchema = z.object({
     .regex(/[a-z]/)
     .regex(/[0-9]/)
     .regex(/[^a-zA-Z0-9]/),
-  birth_date: z.string()
-    .datetime()
+  birth_date: z.string(), 
+  role: z.string()
 });
 
 export type UserSchema = z.infer<typeof userSchema>;
