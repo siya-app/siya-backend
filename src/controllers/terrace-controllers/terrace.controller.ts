@@ -1,5 +1,5 @@
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
-import Tag from '../../models/terrace-model/db/tags-model-sequelize.js'
+// import Tag from '../../models/terrace-model/db/tags-model-sequelize.js'
 import { CustomTerraceSchema } from '../../models/terrace-model/zod/customTerrace-schema.js';
 import { Request, Response } from 'express';
 
@@ -54,102 +54,6 @@ export const getTerraceById = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Error fetching terrace" });
     }
 };
-
-export const getFilteredTerraces = async (req: Request, res: Response) => {
-    const { cover, dietary, emotional, food, placement } = req.query;
-
-    try {
-        // Convert query params to an array of tag IDs
-        const filterIds = [
-            cover, 
-            dietary, 
-            emotional, 
-            food, 
-            placement
-        ].filter(Boolean).map(Number);
-
-        // Base query options
-        const queryOptions: any = {
-            include: [
-                {
-                    model: Tag,
-                    as: 'tags',
-                    attributes: ['id', 'name', 'category', 'image_url'],
-                    through: { attributes: [] } // Hide junction table attributes
-                }
-            ]
-        };
-
-        // Apply filters if any are provided
-        if (filterIds.length > 0) {
-            queryOptions.include[0].where = {
-                id: filterIds
-            };
-            
-            // Count how many unique categories are being filtered
-            const categoryCount = await Tag.count({
-                where: { id: filterIds },
-                attributes: ['category'],
-                group: ['category'],
-                distinct: true
-            });
-
-            queryOptions.having = sequelize.literal(
-                `COUNT(DISTINCT tags.id) >= ${categoryCount.length}`
-            );
-            queryOptions.group = ['Terrace.id'];
-        }
-
-        const terraces = await Terrace.findAll(queryOptions);
-
-        if (!terraces || terraces.length === 0) {
-            return res.status(404).json({ 
-                message: "No terraces found matching the selected filters",
-                suggestion: "Try broadening your search criteria"
-            });
-        }
-
-        // Optional: Format the response to group tags by category
-        const formattedTerraces = terraces.map(terrace => ({
-            ...terrace.get({ plain: true }),
-            tagsByCategory: terrace.tags.reduce((acc, tag) => {
-                if (!acc[tag.category]) {
-                    acc[tag.category] = [];
-                }
-                acc[tag.category].push(tag);
-                return acc;
-            }, {})
-        }));
-
-        res.status(200).json({
-            count: terraces.length,
-            terraces: formattedTerraces
-        });
-
-    } catch (error: any) {
-        console.error('❌ Error fetching filtered terraces:', error);
-
-        if (error.name === 'SequelizeDatabaseError') {
-            return res.status(400).json({ 
-                error: "Invalid filter parameters",
-                details: error.message
-            });
-        }
-
-        if (error.name === 'ZodError') {
-            return res.status(400).json({ 
-                error: "Validation error", 
-                details: error.errors 
-            });
-        }
-
-        return res.status(500).json({ 
-            error: "Internal server error",
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-};
-
 
 // http://localhost:8080/terraces
 // POST items

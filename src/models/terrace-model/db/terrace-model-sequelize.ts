@@ -42,6 +42,7 @@ export class Terrace extends Model {
         food?: string[];
         placement?: string[];
     };
+    public phone_num?: string;
 }
 
 Terrace.init({
@@ -175,6 +176,11 @@ Terrace.init({
                 ...rawValue
             };
         }
+    },
+    phone_num: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: ''
     }
 },
     {
