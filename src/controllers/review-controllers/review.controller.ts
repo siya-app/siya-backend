@@ -3,13 +3,14 @@ import { Request, Response } from 'express';
 import Review from '../../models/review-model/review.model.js';
 import User from '../../models/user-model/user.model.js';
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
+import '../../models/associations/associations.ts'
 //import supabaseAdmin from '../config/supabase-admin.js';
 
 import { reviewSchema } from '../../models/review-model/zod/review-schema.js';
 
 export const getReviews = async (req: Request, res: Response) => {
   try {
-    const reviews = await Review.findAll({
+    const reviews = await Review.findAll(/* {
       include: [
         {
           model: User,
@@ -20,7 +21,7 @@ export const getReviews = async (req: Request, res: Response) => {
           attributes: ['id', 'business_name'], //mismo caso que el anterior, puedo obtener info de la terraza aunque no este creada en mi model
         },
       ],
-    });
+    } */);
 
     res.json(reviews);
   } catch (error) {
@@ -76,6 +77,8 @@ const supabaseAdmin = createClient(
 export default supabaseAdmin; */
 
 export const deleteReview =  async (req: Request, res: Response) => {
+    return res.status(503).json({ error: 'deleteReview is temporarily disabled by Carles' });
+
   const { id } = req.params;
   const authHeader = req.headers.authorization;
 
@@ -87,7 +90,7 @@ export const deleteReview =  async (req: Request, res: Response) => {
 
   try {
     // 1. Validem el token i obtenim el Firebase UID
-    const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await admin.auth().verifyIdToken(token); /* !!aquesta linea em dona error al admin!!! */
     const uid = decoded.uid;
 
     // 2. Busquem la review

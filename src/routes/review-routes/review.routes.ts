@@ -3,8 +3,9 @@ import { getReviews, postReview, deleteReview } from '../../controllers/review-c
 
 const router = Router();
 
-router.get('/reviews', getReviews);
-router.post('/reviews', postReview);
-router.delete('/reviews/:id', deleteReview);
+router.get('/', getReviews);
+router.post('/', postReview);
+router.delete('/:id', deleteReview);
+console.log('Review routes initialized');
 
 export default router;
