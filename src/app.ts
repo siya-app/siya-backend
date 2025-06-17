@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan'
 import uploadRoutes from './routes/upload-routes/upload.route.js'
+
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
 import tagsRouter from './routes/terrace-routes/tags.routes.js';
+
 import userRoutes from './routes/user-routes/user.routes.js'
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
 //import { sequelize } from './config/sequelize-config.js';
@@ -14,6 +16,7 @@ import './models/associations/associations.js'
 import { sequelize } from './config/sequelize-config.js';
 import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
 import authRoutes from './routes/auth.routes/auth.route.js'
+import reviewRoutes from './routes/review-routes/review.routes.js';
 console.log('--- STARTUP TEST LOG ---');
 
 console.log('Environment loaded:', {
@@ -64,7 +67,9 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" })); // For form data
 // api routes here
 app.use('/', userRoutes);
 app.use('/', terraceRoutes);
-app.use('/', authRoutes)
+
+app.use('/',authRoutes)
+app.use('/reviews', reviewRoutes);
 app.use("/", tagsRouter);
 
 
@@ -72,6 +77,7 @@ app.use('/', bookingRoutes)
 
 app.use('/', paymentRoutes)
 app.use('/', uploadRoutes)
+//app.use('/api', fakeDataRoutes); // Assuming you have a fakeDataRouter defined
 
 // middleware -->
 // app.use(notFound);

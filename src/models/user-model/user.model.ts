@@ -81,7 +81,7 @@ class User extends Model {
   declare password_hash: string;
   declare role: 'client' | 'owner'; // Tipado más estricto para el rol
   declare id_terrace: string | null; // Usar 'string | null' si allowNull es true
-  declare restaurantId: string | null; // Usar 'string | null' si allowNull es true
+ 
 
   // Las propiedades de tiempo como createdAt y updatedAt también deben declararse
   declare createdAt: Date;
@@ -132,16 +132,7 @@ User.init(
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
     },
-    restaurantId: {
-      type: DataTypes.UUID, // Ajusta el tipo si los IDs de tus restaurantes no son UUIDs
-      allowNull: true,
-      references: {
-        model: 'restaurants', // Asegúrate de que esto coincide con el nombre real de tu tabla Restaurant
-        key: 'id',
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-    }
+    
   },
   {
     sequelize,

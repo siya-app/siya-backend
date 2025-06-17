@@ -152,3 +152,26 @@ export const deleteTerrace = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Error deleting terrace" });
     }
 };
+
+//-----Claim terrace------//
+export const getTerraceByCatastroRef = async (req: Request, res: Response) => {
+  try {
+    const { catastroRef } = req.params;
+
+    // Busca una terraza por su referencia catastral
+    const terrace = await Terrace.findOne({
+      where: {
+        cadastro_ref: catastroRef // Asumiendo que tu columna se llama 'cadastro_ref'
+      }
+    });
+
+    if (!terrace) {
+      return res.status(404).json({ message: "No s'ha trobat cap terrassa amb aquesta referència catastral." });
+    }
+
+    res.status(200).json(terrace);
+  } catch (error) {
+    console.error("Error al buscar terrassa per referència catastral:", error);
+    res.status(500).json({ message: 'Error intern del servidor al buscar la terrassa.' });
+  }
+};
