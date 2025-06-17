@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createUser, getAllUsers, getUserByEmailOrId, updateUser, deleteUser } from '../../controllers/user-controllers/user.controller.js';
+import { createUser, getAllUsers, getUserByEmailOrId, updateUser, deleteUser , getLoggedInUserProfile} from '../../controllers/user-controllers/user.controller.js';
 import { isTokenValid } from '../../middleware/auth.middleware.js'; // ✅ Importación corregida para el middleware
 import { loginUser } from '../../controllers/auth-controller/auth.controller.js';
 
@@ -10,11 +10,15 @@ router.post('/login', loginUser);
 router.post('/users', createUser);
 router.get('/users', getAllUsers); // Do we need this route?????
 router.get('/users/:id', isTokenValid, getUserByEmailOrId);
-
+router.get('/perfil', isTokenValid, getLoggedInUserProfile);
 
 router.put('/users/:id', isTokenValid, updateUser);
 
 
 router.delete('/users/:id', isTokenValid, deleteUser);
+
+router.put("/users/:userId/claim-terrace", claimTerraceOwnership);
+
+
 
 export default router;

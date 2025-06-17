@@ -5,6 +5,7 @@ import {
     createNewTerrace,
     updateTerrace,
     deleteTerrace,
+    getTerraceByCatastroRef
 } from "../../controllers/terrace-controllers/terrace.controller.js";
 
 const router = Router();
@@ -14,6 +15,8 @@ router.post("/terraces", createNewTerrace);
 router.get("/terraces/:id", getTerraceById);
 router.put("/terraces/:id", updateTerrace);
 router.delete("/terraces/:id", deleteTerrace);
+
+router.get("/terraces/by-catastro/:catastroRef", getTerraceByCatastroRef);
 
 export default router;
 
