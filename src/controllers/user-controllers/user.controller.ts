@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import User from "../../models/user-model/user.model.js";
+
 import { userSchema } from "../../models/user-model/zod/user.schema.js";
 // import { log } from "console"; // 'log' from 'console' is usually just console.log
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import bcrypt from "bcrypt";
 import { AuthenticatedRequest } from "../../middleware/auth.middleware.js"; // Importar la interfaz AuthenticatedRequest
+import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
 
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -63,6 +65,34 @@ export const getUserByEmailOrId = async (req: Request, res: Response) => {
   }
 };
 
+export const getLoggedInUserProfile = async (req, res) => {
+    try {
+      console.log('--- getLoggedInUserProfile ---');
+        console.log('req.user en getLoggedInUserProfile (antes de la verificación):', req.user);
+        // Asumiendo que isTokenValid añade el ID del usuario (o el objeto completo del usuario) a `req.user`
+        // por ejemplo: req.user = { id: 'someUserId', email: 'user@example.com', ... };
+        if (!req.user || !req.user.id) {
+          console.log('Debug: req.user o req.user.id es nulo/indefinido.');
+            return res.status(401).json({ message: 'No autorizado: Información de usuario no disponible.' });
+        }
+
+        const userId = req.user.id; // Obtenemos el ID del usuario del token validado
+        console.log('User ID from req.user:', userId);
+        const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } }); // Busca el usuario por ID, excluyendo la contraseña
+        // O si estás usando `getUserByEmailOrId` en tu controlador y puede tomar un ID directamente:
+        // const user = await getUserByEmailOrId(userId); // Adaptar si getUserByEmailOrId no es una función simple
+
+        if (!user) {
+          console.log('Debug: Perfil de usuario no encontrado en la base de datos para ID:', userId);
+            return res.status(404).json({ message: 'Perfil de usuario no encontrado.' });
+        }
+
+        res.status(200).json(user); // Devuelve los datos del perfil del usuario
+    } catch (error) {
+        console.error('Error al obtener perfil del usuario logueado:', error);
+        res.status(500).json({ message: 'Error del servidor al obtener el perfil.' });
+    }
+};
 
 export const createUser = async (req: Request, res: Response) => { // ✅ Añadir 'res: Response'
   try {
@@ -202,4 +232,90 @@ export const deleteUser = async (req: AuthenticatedRequest, res:Response) => { /
         }
         return res.status(500).json({ error: "Error interno del servidor al eliminar el usuario." });
     }
+};
+
+//-----Claiming a terrce------//
+
+export const claimTerraceOwnership = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { terraceId } = req.body; // El ID de la terraza se envía en el cuerpo de la solicitud
+
+    // 1. Validar que el usuario y la terraza existan
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
+    const terrace = await Terrace.findByPk(terraceId);
+    if (!terrace) {
+      return res.status(404).json({ message: 'La terrassa especificada no existeix.' });
+    }
+
+    // 2. Verificar si la terraza ya tiene un dueño
+    const existingOwner = await User.findOne({
+      where: {
+        id_terrace: terraceId, // Busca si hay algún usuario que ya sea dueño de esta terraza
+        role: 'owner'
+      }
+    });
+
+    if (existingOwner) {
+      if (existingOwner.id === userId) {
+          return res.status(200).json({ message: "Ja ets el propietari d'aquesta terrassa." });
+      }
+      return res.status(409).json({ message: "Aquesta terrassa ja s'ha reclamat per un altre usuari."});
+    }
+
+    // 3. Verificar si el usuario ya es dueño de otra terraza
+    // Un usuario solo puede ser dueño de una terraza.
+    if (user.role === 'owner' && user.id_terrace !== null) {
+      return res.status(409).json({ message: "Ja ets propitari d'una terrssa. Cada usuari només por reclamar una terrassa."});
+    }
+
+    // 4. (Eliminar/Simplificar) Obtener el restaurantId de la terraza
+    // Si no tienes un modelo Restaurant, y el campo restaurantId en User no es relevante o se elimina,
+    // simplemente no lo incluyas en la actualización del usuario.
+    // Si tu tabla `terraces` *sí* tiene un campo `restaurantId` (aunque no sea una referencia a otra tabla),
+    // y quieres copiar ese valor al usuario, entonces SÍ lo mantendrías y lo copiarías desde `terrace.restaurantId`.
+    // Por ejemplo, si el restaurantId en la tabla terrace es simplemente un identificador único (UUID o STRING)
+    // que viene de algún sistema externo o que generas para agrupar terrazas.
+
+    let restaurantIdToAssign = null; // Inicializamos a null por si no lo usamos
+
+    // // Si tu modelo `Terrace` tiene un `restaurantId` y quieres que el `User` también lo tenga (aunque no referencie una tabla `Restaurant`):
+    // // Ejemplo: `Terrace` tiene un campo `restaurant_identifier: DataTypes.UUID`
+    // if (terrace.restaurantId) { // Asegúrate de que el nombre del campo en tu modelo Terrace sea correcto, ej. terrace.restaurantId
+    //     restaurantIdToAssign = terrace.restaurantId;
+    // }
+
+
+    // 5. Actualizar el usuario
+    const updatedUser = await user.update({
+      role: 'owner',
+      id_terrace: terrace.id,
+      // Solo incluye restaurantId si decides mantenerlo en el modelo User y quieres asignarle un valor
+      // de la terraza, o si lo eliminas, simplemente no lo pases aquí.
+      restaurantId: restaurantIdToAssign // Pasa el valor si es relevante
+    });
+
+    await terrace.update({
+      is_claimed: true
+    });
+
+    res.status(200).json({
+      message: "Enhorabona! Ara ets el propietari d'aquesta terrassa",
+      
+      user: { 
+        id: updatedUser.id,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        id_terrace: updatedUser.id_terrace,
+     
+      }
+    });
+  } catch (error) {
+    console.error("Error al reclamar la propietat de la terrassa:", error);
+    res.status(500).json({ message: 'Error intern del servidor al reclamar la propietat de la terrassa.' });
+  }
 };
