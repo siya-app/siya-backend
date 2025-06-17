@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import uploadRoutes from './routes/upload-routes/upload.route.js'
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
+import tagsRouter from './routes/terrace-routes/tags.routes.js';
 import userRoutes from './routes/user-routes/user.routes.js'
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
 //import { sequelize } from './config/sequelize-config.js';
@@ -64,6 +65,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" })); // For form data
 app.use('/', userRoutes);
 app.use('/', terraceRoutes);
 app.use('/', authRoutes)
+app.use("/", tagsRouter);
 
 
 app.use('/', bookingRoutes)
