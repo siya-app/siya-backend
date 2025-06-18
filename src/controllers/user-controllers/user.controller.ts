@@ -296,7 +296,7 @@ export const claimTerraceOwnership = async (req, res) => {
       id_terrace: terrace.id,
       // Solo incluye restaurantId si decides mantenerlo en el modelo User y quieres asignarle un valor
       // de la terraza, o si lo eliminas, simplemente no lo pases aquí.
-      restaurantId: restaurantIdToAssign // Pasa el valor si es relevante
+      restaurantId: terrace.id // Pasa el valor si es relevante
     });
 
     await terrace.update({
