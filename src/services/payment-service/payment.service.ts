@@ -1,23 +1,24 @@
-import { Request, Response } from "express";
+import { Request, Response } from "express"; // Importar Request y Response para tipado
 import Stripe from "stripe";
 import Booking from "../../models/booking-model/booking.model.js";
 import dotenv from 'dotenv'
 
+dotenv.config(); // Asegúrate de cargar las variables de entorno
 
-
-
-
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-//   apiVersion: "2023-10-16"
-// });
-
-const stripe= new Stripe(process.env.STRIPE_PRIVATE_KEY!,{
-     apiVersion: "2023-10-16" as Stripe.LatestApiVersion
+const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY!,{
+    apiVersion: "2023-10-16" as Stripe.LatestApiVersion
 })
 
 export const createSession = async (req: Request, res: Response) => {
   try {
-    const { booking_id } = req.body;
+    // ✅ Acceder a booking_id y terrace_id desde el cuerpo de la solicitud
+    const booking_id = req.body.booking_id;
+    let terrace_id = req.body.terrace_id; 
+
+    // Asegurarse de que terrace_id siempre sea una cadena, incluso si no se proporciona
+    if (typeof terrace_id === 'undefined' || terrace_id === null) {
+      terrace_id = ''; 
+    }
 
     const booking = await Booking.findByPk(booking_id);
 
@@ -25,7 +26,6 @@ export const createSession = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Booking not found" });
     }
 
-  
     const price = Number(booking.booking_price);
 
     if (isNaN(price) || price <= 0) {
@@ -36,6 +36,7 @@ export const createSession = async (req: Request, res: Response) => {
 
     console.log("Creating Stripe session with:", {
       booking_id: booking.id,
+      terrace_id: terrace_id, // terrace_id ahora está definido
       party_length: booking.party_length,
       price,
       unitAmount,
@@ -57,8 +58,9 @@ export const createSession = async (req: Request, res: Response) => {
           quantity: 1,
         },
       ],
-      success_url: `http://localhost:3000/success?bookingId=${booking.id}`,
-      cancel_url: `http://localhost:3000/cancel`, //recomendado puerto 3000 esto se manejara desde el front
+      // ✅ terrace_id se usa aquí, ahora que está definido
+      success_url: `http://localhost:4200/calendar?terraceId=${terrace_id}&bookingId=${booking.id}`, 
+      cancel_url: `http://localhost:4200/calendar?terraceId=${terrace_id}&status=cancelled`, // También corregido aquí
       metadata: {
         bookingId: booking.id,
       },
@@ -70,41 +72,3 @@ export const createSession = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-// catch(error:any){
-//     console.error("Webhook signature error:", err.message)
-// }
-
-// Webhook
-// export const handleStripeWebhook = async (req: Request, res: Response) => {
-//   const sig = req.headers["stripe-signature"];
-//   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
-//   let event: Stripe.Event;
-
-//   try {
-//     event = stripe.webhooks.constructEvent(req.body, sig!, webhookSecret);
-//   } catch (err: any) {
-//     console.error("Webhook signature error:", err.message);
-//     return res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-
-//   if (event.type === "checkout.session.completed") {
-//     const session = event.data.object as Stripe.Checkout.Session;
-//     const bookingId = session.metadata?.bookingId;
-
-//     if (bookingId) {
-//       await Booking.update(
-//         {
-//           is_paid: true,
-//           payment_id: session.payment_intent?.toString() ?? null,
-//         },
-//         {
-//           where: { id: bookingId },
-//         }
-//       );
-//     }
-//   }
-
-//   res.status(200).send("Webhook received");
-// };

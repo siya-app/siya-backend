@@ -8,6 +8,7 @@ router.post("/booking",isTokenValid, createBooking)
 router.put("/booking/:id",isTokenValid, updateBooking)
 router.get("/booking",isTokenValid, getBooking )
 router.get("/booking/:id",isTokenValid, getBookingById )
-router.get("/booking/id",isTokenValid, deleteBookingById )
+router.delete("/booking/id",isTokenValid, deleteBookingById )
+
 
 export default router
