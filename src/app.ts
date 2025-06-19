@@ -2,8 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan'
 import uploadRoutes from './routes/upload-routes/upload.route.js'
+
 import { createCustomValidatedTerrace } from './controllers/terrace-controllers/terrace.validator.js';
 import terraceRoutes from './routes/terrace-routes/terraces.router.js';
+import tagsRouter from './routes/terrace-routes/tags.routes.js';
+
 import userRoutes from './routes/user-routes/user.routes.js'
 import bookingRoutes from './routes/booking-routes/booking.routes.js'
 //import { sequelize } from './config/sequelize-config.js';
@@ -13,6 +16,7 @@ import './models/associations/associations.js'
 import { sequelize } from './config/sequelize-config.js';
 import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
 import authRoutes from './routes/auth.routes/auth.route.js'
+import reviewRoutes from './routes/review-routes/review.routes.js';
 console.log('--- STARTUP TEST LOG ---');
 
 console.log('Environment loaded:', {
@@ -50,26 +54,30 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed methods
     credentials: true, // If cookies/auth headers needed!
     //TODO take a look at middleware headers auth
-   
+
 }));
 
 
 
 //This middleware parses incoming JSON data from the request body, limit 50mb for saving space
-app.use(express.json({limit:"50mb"}));
-app.use(express.urlencoded({ extended: true, limit:"50mb" })); // For form data
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" })); // For form data
 
 
 // api routes here
-app.use('/',userRoutes);
+app.use('/', userRoutes);
 app.use('/', terraceRoutes);
-app.use('/',authRoutes)
-//! missing
+
+app.use('/', authRoutes)
+app.use('/reviews', reviewRoutes);
+app.use("/", tagsRouter);
+
 
 app.use('/', bookingRoutes)
-//! missing
- app.use('/', paymentRoutes)
+
+app.use('/', paymentRoutes)
 app.use('/', uploadRoutes)
+//app.use('/api', fakeDataRoutes); // Assuming you have a fakeDataRouter defined
 
 // middleware -->
 // app.use(notFound);
@@ -111,11 +119,11 @@ const startServer = async () => {
 };
 
 startServer();
-// try {
-//     cronFetch('30 2 1 */3 *')
-// } catch (err) {
-//     console.error(`Error triggering cron, ${err}`)
-// }
+try {
+    cronFetch('30 2 1 */3 *')
+} catch (err) {
+    console.error(`Error triggering cron, ${err}`)
+}
 
 // import { Request, Response, NextFunction } from 'express';
 // import jwt from 'jsonwebtoken';

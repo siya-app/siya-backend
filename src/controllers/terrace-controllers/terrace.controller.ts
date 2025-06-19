@@ -1,4 +1,5 @@
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
+// import Tag from '../../models/terrace-model/db/tags-model-sequelize.js'
 import { CustomTerraceSchema } from '../../models/terrace-model/zod/customTerrace-schema.js';
 import { Request, Response } from 'express';
 
@@ -95,15 +96,15 @@ export const updateTerrace = async (req: Request, res: Response) => {
     }
 
     try {
-        const [updatedRows] = await Terrace.update(updateData, { 
-            where: { id: terraceID } 
+        const [updatedRows] = await Terrace.update(updateData, {
+            where: { id: terraceID }
         });
 
         if (updatedRows === 0) {
             return res.status(404).json({ error: "Terrace not found or no changes made" });
         }
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Terrace updated successfully",
             terraceID,
             updatedFields: updateData
@@ -113,17 +114,17 @@ export const updateTerrace = async (req: Request, res: Response) => {
         console.error(`Error updating terrace ID-${terraceID}: ${error}`);
 
         if (error.name === 'ZodError') {
-            return res.status(500).json({ 
-                error: "❌ Error updating terrace", 
-                terraceID, 
+            return res.status(500).json({
+                error: "❌ Error updating terrace",
+                terraceID,
                 details: error.errors
             });
         }
-        
+
         console.error(`❌ Error updating terrace:`, error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             error: "Error updating terrace",
-            message: error.message 
+            message: error.message
         });
     }
 };
@@ -145,9 +146,32 @@ export const deleteTerrace = async (req: Request, res: Response) => {
         console.error(`Error deleting terrace ID-${terraceID}: ${error}`);
 
         if (error.name === 'ZodError') {
-            return res.status(500).json({ error: "❌ Error deleting terrace", terraceID, details: error.errors});
+            return res.status(500).json({ error: "❌ Error deleting terrace", terraceID, details: error.errors });
         }
         console.error(`❌ Error adding terrace:`, error);
         return res.status(500).json({ error: "Error deleting terrace" });
     }
+};
+
+//-----Claim terrace------//
+export const getTerraceByCatastroRef = async (req: Request, res: Response) => {
+  try {
+    const { catastroRef } = req.params;
+
+    // Busca una terraza por su referencia catastral
+    const terrace = await Terrace.findOne({
+      where: {
+        cadastro_ref: catastroRef // Asumiendo que tu columna se llama 'cadastro_ref'
+      }
+    });
+
+    if (!terrace) {
+      return res.status(404).json({ message: "No s'ha trobat cap terrassa amb aquesta referència catastral." });
+    }
+
+    res.status(200).json(terrace);
+  } catch (error) {
+    console.error("Error al buscar terrassa per referència catastral:", error);
+    res.status(500).json({ message: 'Error intern del servidor al buscar la terrassa.' });
+  }
 };
