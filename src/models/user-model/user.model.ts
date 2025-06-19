@@ -125,6 +125,7 @@ User.init(
       type: DataTypes.UUID,
       allowNull: true,
       unique: true,
+      field: 'id_terrace',
       references: {
         model: 'terraces',
         key: 'id',

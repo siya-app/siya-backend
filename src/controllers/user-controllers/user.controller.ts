@@ -236,18 +236,20 @@ export const deleteUser = async (req: AuthenticatedRequest, res:Response) => { /
 
 //-----Claiming a terrce------//
 
-export const claimTerraceOwnership = async (req, res) => {
+export const claimTerraceOwnership = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const { terraceId } = req.body; // El ID de la terraza se envía en el cuerpo de la solicitud
-
+    console.log("Iniciando claimTerraceOwnership", { userId, terraceId });
     // 1. Validar que el usuario y la terraza existan
     const user = await User.findByPk(userId);
+    console.log("Usuario encontrado en DB:", user?.id, user?.role);
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
     const terrace = await Terrace.findByPk(terraceId);
+    console.log("Terrace:", terrace?.id, terrace?.is_claimed);
     if (!terrace) {
       return res.status(404).json({ message: 'La terrassa especificada no existeix.' });
     }
@@ -291,26 +293,35 @@ export const claimTerraceOwnership = async (req, res) => {
 
 
     // 5. Actualizar el usuario
-    const updatedUser = await user.update({
-      role: 'owner',
-      id_terrace: terrace.id,
-      // Solo incluye restaurantId si decides mantenerlo en el modelo User y quieres asignarle un valor
-      // de la terraza, o si lo eliminas, simplemente no lo pases aquí.
-      restaurantId: terrace.id // Pasa el valor si es relevante
-    });
+    // const updatedUser = await user.update({
+    //   role: 'owner',
+    //   id_terrace: terrace.id,
+    //   // Solo incluye restaurantId si decides mantenerlo en el modelo User y quieres asignarle un valor
+    //   // de la terraza, o si lo eliminas, simplemente no lo pases aquí.
+    //   //restaurantId: terrace.id // Pasa el valor si es relevante
+    // });
+console.log("Preparando actualización del usuario...");
+    user.role = 'owner';
+user.id_terrace = terrace.id;
+await user.save(); 
+console.log("Usuario actualizado:", user.toJSON());
+    await user.reload(); // Vuelve a traer los datos de la base de datos
+console.log("Reloaded user:", user.id_terrace);
+
+    
 
     await terrace.update({
       is_claimed: true
     });
-
+console.log("Terrace marcado como reclamado");
     res.status(200).json({
       message: "Enhorabona! Ara ets el propietari d'aquesta terrassa",
       
       user: { 
-        id: updatedUser.id,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        id_terrace: updatedUser.id_terrace,
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        id_terrace: user.id_terrace,
      
       }
     });
