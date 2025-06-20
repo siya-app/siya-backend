@@ -60,6 +60,7 @@ export const postReview = async (req: Request, res: Response) => {
       rating,
       comment,
       userId,
+      userName: user.name, // opcional, però si existeix, l'afegim
       terraceId,
     });
 
