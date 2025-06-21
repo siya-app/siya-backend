@@ -3,8 +3,8 @@ import { addFavorite, getFavorites, removeFavorite } from '../../controllers/fav
 
 const router = Router();
 
-router.post('/favorites', addFavorite);
-router.get('/favorites', getFavorites);
-router.delete('/favorites', removeFavorite);
+router.post('/', addFavorite);
+router.get('/', getFavorites);
+router.delete('/', removeFavorite);
 
 export default router;

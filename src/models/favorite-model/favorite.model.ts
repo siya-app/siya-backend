@@ -7,11 +7,11 @@ const Favorite = sequelize.define('Favorite', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  userId: { //if breaks check later if it's id_user!!!
+  id_user: { //if breaks check later if it's id_user!!!
     type: DataTypes.UUID,
     allowNull: false,
   },
-  terraceId: { //if broken check later if it's id_terrace !!!
+  id_terrace: { //if broken check later if it's id_terrace !!!
     type: DataTypes.UUID,
     allowNull: false,
   },

@@ -42,13 +42,16 @@ export const addFavorite = async (req: Request, res: Response) => {
 };
 
 export const getFavorites = async (req: Request, res: Response) => {
-  const userId = req.body.data.user.id; //sense validacio ZOD
+const userId = req.query.userId as string;
+if (!userId) {
+  return res.status(400).json({ error: 'Missing userId query param' });
+}
 
   try {
     const favorites = await Favorite.findAll({ where: { id_user: userId } });
     res.status(200).json(favorites);
   } catch (error) {
-    console.error('Error fetching favorites:', error);
+    console.error('Error al obtenir els favs:', error);
     res.status(500).json({ error: 'Error fetching favorites' });
   }
 };
