@@ -15,10 +15,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
     if (typeof error === 'object' && error !== null && 'name' in error && error.name === 'ZodError') {
       return res
         .status(400)
-        .json({ error: "❌ Error de validación al obtener usuarios", details: (error as any).errors });
+        .json({ error: "❌ Error de validació a l'obtenir usuaris", details: (error as any).errors });
     }
 
-    return res.status(500).json({ error: "Error al obtener usuarios" });
+    return res.status(500).json({ error: "Error a l'obtenir usuaris" });
   }
 };
 
@@ -42,45 +42,45 @@ export const getUserByEmailOrId = async (req: Request, res: Response) => {
       });
     }
     if (!user) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
+      return res.status(404).json({ error: "Usuari no trobat" });
     }
     res.status(200).json(user);
   } catch (error: unknown) {
-    console.error(`❌ Error al obtener usuario ${identifier}:`, error);
+    console.error(`❌ Error a l'obtenir usuari ${identifier}:`, error);
 
     if (typeof error === 'object' && error !== null && 'name' in error && error.name === "ZodError") {
       return res
         .status(400)
-        .json({ error: "❌ Error de validación al obtener usuario", details: (error as any).errors });
+        .json({ error: "❌ Error de validació a l'obtenir usuari", details: (error as any).errors });
     }
 
-    return res.status(500).json({ error: "Error al obtener usuario" });
+    return res.status(500).json({ error: "Error a l'obtenir usuari" });
   }
 };
 
 export const getLoggedInUserProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
       console.log('--- getLoggedInUserProfile ---');
-      console.log('req.user en getLoggedInUserProfile (antes de la verificación):', req.user);
+      
       
       if (!req.user || !req.user.id) {
-        console.log('Debug: req.user o req.user.id es nulo/indefinido.');
-          return res.status(401).json({ message: 'No autorizado: Información de usuario no disponible.' });
+        
+          return res.status(401).json({ message: "No autoritzat: Informació d'usuario no disponible." });
       }
 
       const userId = req.user.id;
-      console.log('User ID from req.user:', userId);
+      
       const user = await User.findByPk(userId, { attributes: { exclude: ['password_hash'] } }); 
 
       if (!user) {
-        console.log('Debug: Perfil de usuario no encontrado en la base de datos para ID:', userId);
-          return res.status(404).json({ message: 'Perfil de usuario no encontrado.' });
+        console.log('Debug: Perfil de usuari no trobat a la base de dades per ID:', userId);
+          return res.status(404).json({ message: 'Perfil de usuari no trobat.' });
       }
 
       res.status(200).json(user);
     } catch (error) {
-        console.error('Error al obtener perfil del usuario logueado:', error);
-        res.status(500).json({ message: 'Error del servidor al obtener el perfil.' });
+        console.error("Error a l'obtenir perfil del usuario logueado:", error);
+        res.status(500).json({ message: "Error del servidor a l'obtenir el perfil." });
     }
 };
 
@@ -89,7 +89,7 @@ export const createUser = async (req: Request, res: Response) => {
     const userData = userSchema.parse(req.body);
     const { name, email, password_hash, birth_date, role } = userData;
     
-    console.log("Datos recibidos en el backend para crear usuario:", req.body); 
+     
     const hashedPassword = await bcrypt.hash(password_hash, 10);
 
     const newUser = await User.create({
@@ -102,17 +102,17 @@ export const createUser = async (req: Request, res: Response) => {
 
     res.status(201).json(newUser);
   } catch (error: unknown) {
-    console.error("❌ Error creando usuario:", error);
+    console.error("❌ Error al crear usuari:", error);
 
     if (typeof error === 'object' && error !== null && 'name' in error) {
       if (error.name === "SequelizeUniqueConstraintError") {
-        return res.status(409).json({ error: "El email ya existe." });
+        return res.status(409).json({ error: "Aquest email ja existeix." });
       }
       if (error.name === "ZodError") {
-        return res.status(400).json({ error: "Datos de usuario inválidos", details: (error as any).errors });
+        return res.status(400).json({ error: "Dades d'usuari invàlides", details: (error as any).errors });
       }
     }
-    return res.status(500).json({ error: "Error interno del servidor al crear usuario." });
+    return res.status(500).json({ error: "Error intern del servidor al crear usuari." });
   }
 };
 
@@ -123,36 +123,36 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
   const { name, currentPassword, newPassword } = req.body;
 
   try {
-    // Verificar identidad del usuario
+   
     if (!authenticatedUserId || authenticatedUserId !== userIdToUpdate) {
-      return res.status(403).json({ error: "No tienes permiso para modificar este perfil." });
+      return res.status(403).json({ error: "No tens permisos per modificar aquest perfil." });
     }
 
-    // Buscar usuario
+   
     const user = await User.findByPk(userIdToUpdate);
     if (!user) {
-      return res.status(404).json({ error: "Usuario no encontrado." });
+      return res.status(404).json({ error: "Usuari no trobat." });
     }
 
-    // Verificar contraseña actual
+    
     if (!currentPassword) {
-      return res.status(400).json({ error: "Debes introducir la contraseña actual para actualizar el perfil." });
+      return res.status(400).json({ error: "Has d'introduir la contrasenya actual per actualitzar el perfil." });
     }
 
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "La contraseña actual es incorrecta." });
+      return res.status(401).json({ error: "La contrasenya actual és incorrecta." });
     }
 
-    // Actualizar nombre (si se proporciona)
+    
     if (name) {
       user.name = name;
     }
 
-    // Actualizar contraseña (si se proporciona)
+    
     if (newPassword) {
       if (newPassword.length < 8) {
-        return res.status(400).json({ error: "La nueva contraseña debe tener al menos 8 caracteres." });
+        return res.status(400).json({ error: "La nueva contrasenya ha de contenir com a mínim 8 caràcters." });
       }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password_hash = hashedPassword;
@@ -161,7 +161,7 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
     await user.save();
 
     res.status(200).json({
-      message: "Perfil actualizado correctamente.",
+      message: "Perfil actualitzat correctament.",
       user: {
         id: user.id,
         name: user.name,
@@ -172,8 +172,8 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
       }
     });
   } catch (error) {
-    console.error("❌ Error actualizando perfil:", error);
-    res.status(500).json({ error: "Error interno del servidor al actualizar el perfil." });
+    console.error("❌ Error actualitzant perfil:", error);
+    res.status(500).json({ error: "Error intern del servidor a l'actualitzar el perfil." });
   }
 };
 
@@ -186,21 +186,21 @@ export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
 
     try {
         if (!authenticatedUserId || authenticatedUserId !== userIdToDelete) {
-            return res.status(403).json({ error: "Acceso denegado. No tienes permiso para eliminar esta cuenta." });
+            return res.status(403).json({ error: "No tens permisos per eliminar aquest compte." });
         }
 
         const user = await User.findByPk(userIdToDelete);
         if (!user) {
-            return res.status(404).json({ error: "Usuario no encontrado." });
+            return res.status(404).json({ error: "Usuari no trobat." });
         }
 
         if (!password_hash) {
-            return res.status(400).json({ error: "Se requiere la contraseña para confirmar la eliminación." });
+            return res.status(400).json({ error: "Es requereix la contrasenya per confirmar l'eliminació." });
         }
 
         const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash);
         if (!isPasswordValid) {
-            return res.status(401).json({ error: "Contraseña inválida." });
+            return res.status(401).json({ error: "Contrasenya invàlida." });
         }
 
         // 🧼 Si el usuario es owner y tiene una terraza reclamada, libérala
@@ -214,17 +214,17 @@ export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
 
         await user.destroy();
 
-        return res.status(200).json({ message: 'Perfil eliminado exitosamente' });
+        return res.status(200).json({ message: 'Perfil eliminat exitosament' });
 
     } catch (error: unknown) {
-        console.error(`❌ Error eliminando usuario ${userIdToDelete}:`, error);
+        console.error(`❌ Error eliminant usuari ${userIdToDelete}:`, error);
 
         if (typeof error === 'object' && error !== null && 'name' in error) {
             if ((error as any).name === "SequelizeForeignKeyConstraintError") {
-                return res.status(400).json({ error: "No se puede eliminar el usuario. Existen asociaciones activas.", details: (error as any).message });
+                return res.status(400).json({ error: "No s'ha pogut eliminar aquest usuari. Hi hi associacions actives.", details: (error as any).message });
             }
         }
-        return res.status(500).json({ error: "Error interno del servidor al eliminar el usuario." });
+        return res.status(500).json({ error: "Error intern del servidor a l'eliminar l'usuari." });
     }
 };
 
@@ -233,14 +233,14 @@ export const claimTerraceOwnership = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { terraceId } = req.body;
 
-    console.log(`[CLAIM] Intentando reclamar terrassa: userId=${userId}, terraceId=${terraceId}`);
+   
 
     const user = await User.findByPk(userId);
     if (!user) {
-      console.log(`[CLAIM] Usuario ${userId} no encontrado.`);
-      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    
+      return res.status(404).json({ message: 'Usuari no trobat.' });
     }
-    console.log(`[CLAIM] Usuario encontrado: ${user.email}, rol actual: ${user.role}, id_terrace actual: ${user.id_terrace}`);
+    
 
     // ✅ CAMBIO CLAVE: Usar { raw: true } para obtener un objeto plano
     const rawTerrace = await Terrace.findByPk(terraceId, { raw: true }); 
@@ -248,7 +248,7 @@ export const claimTerraceOwnership = async (req: Request, res: Response) => {
     // ✅ Ahora 'rawTerrace' es un objeto plano, no una instancia de modelo.
     // Esto significa que las propiedades serán accesibles directamente, sin las interferencias del 'public'.
     if (!rawTerrace) {
-      console.log(`[CLAIM] Terrassa ${terraceId} no encontrada.`);
+     
       return res.status(404).json({ message: 'La terrassa especificada no existeix.' });
     }
     // Convertir rawTerrace a un tipo conocido o usar aserciones si es necesario
@@ -325,9 +325,9 @@ export const claimTerraceOwnership = async (req: Request, res: Response) => {
     console.error("Error al reclamar la propietat de la terrassa:", error);
     if (typeof error === 'object' && error !== null && 'name' in error) {
         if (error.name === 'SequelizeForeignKeyConstraintError') {
-            console.error('❌ Error de clave foránea:', (error as any).fields, (error as any).value);
+            console.error('❌ Error de FK:', (error as any).fields, (error as any).value);
         } else if (error.name === 'SequelizeUniqueConstraintError') {
-             console.error('❌ Error de restricción única:', (error as any).fields, (error as any).value);
+             console.error('❌ Error de restricció única:', (error as any).fields, (error as any).value);
         }
     }
     res.status(500).json({ message: 'Error intern del servidor al reclamar la propietat de la terrassa.' });
