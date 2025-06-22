@@ -116,10 +116,6 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import User from "../models/User.js";
-import { AuthenticatedRequest } from "../middleware/authMiddleware.js";
 
 export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
   const authenticatedUserId = req.user?.id;
