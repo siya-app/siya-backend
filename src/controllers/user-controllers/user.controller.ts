@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from "../../models/user-model/user.model.js";
 import { userSchema } from "../../models/user-model/zod/user.schema.js";
 import bcrypt from "bcrypt";
-import { AuthenticatedRequest } from "../../middleware/auth.middleware"; 
+import { AuthenticatedRequest } from "../../middleware/auth.middleware.js" 
 import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js"; 
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -116,101 +116,116 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import User from "../models/User.js";
+import { AuthenticatedRequest } from "../middleware/authMiddleware.js";
+
 export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
-    const authenticatedUserId = req.user?.id;
-    const userIdToUpdate = req.params.id;
-    const { password_hash, name, birth_date, newPassword, claimRestaurant, terraceId } = req.body; 
+  const authenticatedUserId = req.user?.id;
+  const userIdToUpdate = req.params.id;
+  const { name, currentPassword, newPassword } = req.body;
 
-    try {
-        if (!authenticatedUserId || authenticatedUserId !== userIdToUpdate ) {
-            return res.status(403).json({ error: "Acceso denegado. No tienes permiso para modificar este perfil." });
-        }
-
-        const user = await User.findByPk(userIdToUpdate);
-        if (!user) {
-            return res.status(404).json({ error: "Usuario no encontrado." });
-        }
-
-        if (password_hash) { 
-            const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash);
-            if (!isPasswordValid) {
-                return res.status(401).json({ error: "Contraseña inválida" });
-            }
-        } else if (name || birth_date || newPassword || claimRestaurant || terraceId) {
-        }
-
-        if (name !== undefined) {
-            user.name = name;
-        }
-        if (birth_date !== undefined) {
-            user.birth_date = birth_date;
-        }
-        if (newPassword) {
-            if (typeof newPassword !== 'string' || newPassword.length < 8 || 
-                !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || 
-                !/[0-9]/.test(newPassword) || !/[^a-zA-Z0-9]/.test(newPassword)) {
-                return res.status(400).json({ error: "La nueva contraseña no cumple los requisitos de seguridad." });
-            }
-            user.password_hash = await bcrypt.hash(newPassword, 10);
-        }
-
-        if (claimRestaurant && user.role === 'client') {
-            user.role = 'owner';
-        }
-
-        await user.save();
-      
-        const updatedUser = user.toJSON();
-        delete updatedUser.password_hash;
-        return res.status(200).json(updatedUser);
-
-    } catch (error: unknown) {
-        console.error(`❌ Error actualizando perfil de usuario ${userIdToUpdate}:`, error);
-        
-        if (typeof error === 'object' && error !== null && 'name' in error) {
-            if (error.name === "SequelizeUniqueConstraintError") {
-                return res.status(409).json({ error: "El email ya está en uso." });
-            }
-            if (error.name === "ZodError") {
-                return res.status(400).json({ error: "Error de validación de datos: " + (error as any).errors.map((e: any) => e.message).join(', ') });
-            }
-        }
-        return res.status(500).json({ error: "Error interno del servidor al actualizar usuario." });
+  try {
+    // Verificar identidad del usuario
+    if (!authenticatedUserId || authenticatedUserId !== userIdToUpdate) {
+      return res.status(403).json({ error: "No tienes permiso para modificar este perfil." });
     }
+
+    // Buscar usuario
+    const user = await User.findByPk(userIdToUpdate);
+    if (!user) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
+    // Verificar contraseña actual
+    if (!currentPassword) {
+      return res.status(400).json({ error: "Debes introducir la contraseña actual para actualizar el perfil." });
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "La contraseña actual es incorrecta." });
+    }
+
+    // Actualizar nombre (si se proporciona)
+    if (name) {
+      user.name = name;
+    }
+
+    // Actualizar contraseña (si se proporciona)
+    if (newPassword) {
+      if (newPassword.length < 8) {
+        return res.status(400).json({ error: "La nueva contraseña debe tener al menos 8 caracteres." });
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password_hash = hashedPassword;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Perfil actualizado correctamente.",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        birth_date: user.birth_date,
+        role: user.role,
+        id_terrace: user.id_terrace
+      }
+    });
+  } catch (error) {
+    console.error("❌ Error actualizando perfil:", error);
+    res.status(500).json({ error: "Error interno del servidor al actualizar el perfil." });
+  }
 };
 
-export const deleteUser = async (req: AuthenticatedRequest, res:Response) => {
+
+
+export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
     const authenticatedUserId = req.user?.id;
     const userIdToDelete = req.params.id;
     const { password_hash } = req.body;
 
     try {
-        if (!authenticatedUserId || authenticatedUserId !== userIdToDelete) { 
+        if (!authenticatedUserId || authenticatedUserId !== userIdToDelete) {
             return res.status(403).json({ error: "Acceso denegado. No tienes permiso para eliminar esta cuenta." });
         }
 
-        const user = await User.findByPk(userIdToDelete); 
+        const user = await User.findByPk(userIdToDelete);
         if (!user) {
-            return res.status(404).json({ error: "Usuario no encontrado." }); 
+            return res.status(404).json({ error: "Usuario no encontrado." });
         }
 
         if (!password_hash) {
             return res.status(400).json({ error: "Se requiere la contraseña para confirmar la eliminación." });
         }
+
         const isPasswordValid = await bcrypt.compare(password_hash, user.password_hash);
         if (!isPasswordValid) {
             return res.status(401).json({ error: "Contraseña inválida." });
         }
 
+        // 🧼 Si el usuario es owner y tiene una terraza reclamada, libérala
+        if (user.role === 'owner' && user.id_terrace) {
+            const terrace = await Terrace.findByPk(user.id_terrace);
+            if (terrace) {
+                terrace.is_claimed = false;
+                await terrace.save();
+            }
+        }
+
         await user.destroy();
+
         return res.status(200).json({ message: 'Perfil eliminado exitosamente' });
 
     } catch (error: unknown) {
         console.error(`❌ Error eliminando usuario ${userIdToDelete}:`, error);
 
         if (typeof error === 'object' && error !== null && 'name' in error) {
-            if (error.name === "SequelizeForeignKeyConstraintError") {
-                return res.status(400).json({ error: "No se puede eliminar el usuario. Existen reservas o restaurantes asociados.", details: (error as any).message });
+            if ((error as any).name === "SequelizeForeignKeyConstraintError") {
+                return res.status(400).json({ error: "No se puede eliminar el usuario. Existen asociaciones activas.", details: (error as any).message });
             }
         }
         return res.status(500).json({ error: "Error interno del servidor al eliminar el usuario." });
