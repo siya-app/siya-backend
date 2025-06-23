@@ -41,8 +41,12 @@ export const postReview = async (req: Request, res: Response) => {
     const { rating, comment, userId, terraceId } = parsed.data;
 
     // 2. Comprova si l'usuari i la terrassa existeixen
-    const user = await User.findByPk(userId);
-    const terrace = await Terrace.findByPk(terraceId);
+    const user = await User.findByPk(userId,{
+      attributes: ['id', 'email', 'name'], // només els camps que existeixen a Supabase
+    });
+    const terrace = await Terrace.findByPk(terraceId, {
+      attributes: ['id', 'business_name', 'cadastro_ref'], // només els camps que existeixen a Supabase
+    });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -56,6 +60,7 @@ export const postReview = async (req: Request, res: Response) => {
       rating,
       comment,
       userId,
+      userName: user.name, // opcional, però si existeix, l'afegim
       terraceId,
     });
 
