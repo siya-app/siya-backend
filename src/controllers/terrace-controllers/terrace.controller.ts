@@ -37,6 +37,7 @@ export const getTerraceById = async (req: Request, res: Response) => {
     try {
         const terrace = await Terrace.findByPk(terraceID);
         // const terrace = await Terrace.findOne({ where: { id: terraceID } });
+        console.log("📦 Terrace fetched:", terrace?.toJSON());
 
         if (!terrace) {
             return res.status(404).json({ error: "Terrace ID- not found" });

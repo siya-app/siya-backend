@@ -59,7 +59,21 @@ export const postReview = async (req: Request, res: Response) => {
       terraceId,
     });
 
+    const reviews = await Review.findAll({
+      where: { terraceId },
+    });
+  
+    const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const average = total / reviews.length;
+    
+    await Terrace.update(
+      { average_rating: average },
+      { where: { id: terraceId } }
+    );
+    console.log(`🎯 Updated terrace ${terraceId} with average:`, average);
+
     return res.status(201).json(review);
+  
   } catch (error) {
     console.error('Error creating review:', error);
     return res.status(500).json({ error: 'Internal server error' });
