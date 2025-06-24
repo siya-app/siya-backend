@@ -51,6 +51,8 @@
 import User from '../../models/user-model/user.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from "../../middleware/auth.middleware.js"
+import { getUserById } from '../../services/user-services/user.service.js';
 
 const JWT_SECRET_STRING = process.env.JWT_SECRET || 'supersecretdefaultkey';
 const JWT_SECRET = Buffer.from(JWT_SECRET_STRING, 'utf8');
@@ -118,5 +120,35 @@ export const loginUser = async (req: Request, res: Response) => {
   } catch (error: unknown) {
     console.error(`❌ Error al iniciar sesión:`, error);
     return res.status(500).json({ error: 'Error interno del servidor al iniciar sesión.' });
+  }
+};
+
+export const verifyPassword = async (req: AuthenticatedRequest, res: Response) => {
+  const { password } = req.body;
+  const userId = req.user?.id;
+
+  if (!password) {
+    return res.status(400).json({ error: "Has d'introduir la contrasenya." });
+  }
+
+  if (!userId) {
+    return res.status(400).json({ error: "No s'ha pogut identificar l'usuari." });
+  }
+
+  try {
+    const user = await getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "Usuari no trobat." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Contrasenya incorrecta." });
+    }
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error("Error verificant contrasenya:", err);
+    return res.status(500).json({ error: "Error intern del servidor." });
   }
 };
