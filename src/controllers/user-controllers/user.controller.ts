@@ -333,3 +333,43 @@ export const claimTerraceOwnership = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error intern del servidor al reclamar la propietat de la terrassa.' });
   }
 };
+
+
+export const unclaimTerraceOwnership = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "Usuari no trobat." });
+    }
+
+    if (user.role !== "owner" || !user.id_terrace) {
+      return res.status(400).json({ error: "Aquest usuari no és propietari d'una terrassa." });
+    }
+
+    // 1. Desactualitzar la terrassa
+    await Terrace.update(
+      { is_claimed: false },
+      { where: { id: user.id_terrace } }
+    );
+
+    // 2. Desactualitzar l'usuari
+    await user.update({
+      role: "client",
+      id_terrace: null,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "S'ha desfet correctament la propietat.",
+    });
+  } catch (error) {
+    console.error("❌ Error desfent la propietat:", error);
+    return res.status(500).json({
+      error: "Error del servidor desfent la propietat.",
+      details: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
