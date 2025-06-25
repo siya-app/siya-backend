@@ -6,8 +6,8 @@ import { favoriteSchema } from '../../models/favorite-model/zod/favorite-schema.
 
 
 export const addFavorite = async (req: Request, res: Response) => {
-    
-      try {
+
+  try {
 
     // 1. Validació amb Zod
     const parsed = favoriteSchema.safeParse(req.body);
@@ -18,8 +18,8 @@ export const addFavorite = async (req: Request, res: Response) => {
     const { userId, terraceId } = parsed.data;
 
     // 2. Comprova si l'usuari i la terrassa existeixen
-    const user = await User.findByPk(userId,{
-      attributes: ['id'], 
+    const user = await User.findByPk(userId, {
+      attributes: ['id'],
     });
     const terrace = await Terrace.findByPk(terraceId, {
       attributes: ['id'], // només els camps que existeixen a Supabase
@@ -42,10 +42,10 @@ export const addFavorite = async (req: Request, res: Response) => {
 };
 
 export const getFavorites = async (req: Request, res: Response) => {
-const userId = req.query.userId as string;
-if (!userId) {
-  return res.status(400).json({ error: 'Missing userId query param' });
-}
+  const userId = req.query.userId as string;
+  if (!userId) {
+    return res.status(400).json({ error: 'Missing userId query param' });
+  }
 
   try {
     const favorites = await Favorite.findAll({ where: { id_user: userId } });
@@ -58,8 +58,8 @@ if (!userId) {
 
 export const removeFavorite = async (req: Request, res: Response) => {
   const { terraceId, userId } = req.body; //altra manera de fer-ho. check if it works later
-/*   const userId = req.user.id;
- */
+  /*   const userId = req.user.id;
+   */
   try {
     await Favorite.destroy({
       where: { id_user: userId, id_terrace: terraceId },
