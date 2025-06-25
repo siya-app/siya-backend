@@ -170,16 +170,33 @@ export const getBookingsByTerraceId = async (req: Request, res: Response) => {
   try {
     const terraceId = req.params.terraceId;
 
+<<<<<<< HEAD
     if (!terraceId) {
       return res.status(400).json({ error: "Terrace ID is required" });
     }
 
     const bookings = await Booking.findAll({
       where: { terrace_id: terraceId }
+=======
+export const getBookingsForLoggedUser = async (req, res) => {
+  const userId = req.userId; // <- obtenido del token por isTokenValid
+
+  try {
+    const bookings = await Booking.findAll({
+      where: { user_id: userId },
+      include: [
+        {
+          model: Terrace,
+          attributes: ["id", "name", "address"],
+        },
+      ],
+      order: [["booking_date", "DESC"], ["booking_time", "DESC"]],
+>>>>>>> Mvc/user
     });
 
     return res.status(200).json(bookings);
   } catch (error) {
+<<<<<<< HEAD
     console.error("Error fetching bookings by terrace:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -214,3 +231,9 @@ export const markBookingAsShown = async (req: Request, res: Response) => {
     });
   }
 }
+=======
+    console.error("Error al obtener reservas:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
+  }
+};
+>>>>>>> Mvc/user
