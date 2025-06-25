@@ -35,6 +35,14 @@ export class Terrace extends Model {
     public website?: string;
     public profile_pic?: string;
     public reservation_fee?: number;
+    public tags!: {
+        cover?: string[];
+        dietary?: string[];
+        emotional?: string[];
+        food?: string[];
+        placement?: string[];
+    };
+    public phone_num?: string;
 }
 
 Terrace.init({
@@ -153,6 +161,27 @@ Terrace.init({
         allowNull: true,
         defaultValue: ''
     },
+    tags: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        defaultValue: {},
+        get() {
+            const rawValue = this.getDataValue('tags');
+            return {
+                cover: [],
+                dietary: [],
+                emotional: [],
+                food: [],
+                placement: [],
+                ...rawValue
+            };
+        }
+    },
+    phone_num: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: ''
+    }
 },
     {
         sequelize,

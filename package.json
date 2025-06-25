@@ -45,6 +45,7 @@
     "vitest": "^3.2.3"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@types/stripe": "^8.0.417",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",

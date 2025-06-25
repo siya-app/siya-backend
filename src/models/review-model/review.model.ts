@@ -1,70 +1,63 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../../config/sequelize-config.js';
-import User from '../user-model/user.model.js';
-import Terrace from '../terrace-model/db/terrace-model-sequelize.js';
 
-class Review extends Model {
-  public id!: string;
-  public rating!: number;
-  public comment!: string;
-  public userId!: string;
-  public id_terrace!: string;
-  public readonly createdAt!: Date;
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional
+} from 'sequelize';
+import { sequelize } from '../../config/sequelize-config.js';
+
+export class Review extends Model<
+  InferAttributes<Review>,
+  InferCreationAttributes<Review>
+> {
+  declare id: CreationOptional<number>;
+  declare rating: number;
+  declare comment: string;
+  declare userId: string; // 👈 correspon a id_user
+  declare terraceId: string; // 👈 correspon a id_terrace
+  declare createdAt: CreationOptional<Date>;
 }
 
 Review.init(
   {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      type: DataTypes.BIGINT,
+      autoIncrement: true,
+      primaryKey: true
     },
     rating: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: false
     },
     comment: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false
     },
     userId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: User,
-        key: 'id',
-      },
+      field: 'id_user' // 👈 MAPEIG amb la columna real
     },
-    id_terrace: {
+    terraceId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: Terrace,
-        key: 'id',
-      },
+      field: 'id_terrace' // 👈 MAPEIG amb la columna real
     },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
-      field: 'created_at', 
-    },
+      field: 'created_at' // 👈 MAPEIG amb la columna real
+    }
   },
   {
     sequelize,
     modelName: 'Review',
-    tableName: 'review',
-    updatedAt: false, 
-    timestamps: true,
-    createdAt: 'created_at',
+    tableName: 'reviews',
+    timestamps: false // perquè Supabase gestiona created_at manualment
   }
 );
-
-// associacions: per fer les relacions entre models (foreign keys)
-Review.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Review, { foreignKey: 'userId' });
-
-Review.belongsTo(Terrace, { foreignKey: 'id_terrace' });
-Terrace.hasMany(Review, { foreignKey: 'id_terrace' });
 
 export default Review;

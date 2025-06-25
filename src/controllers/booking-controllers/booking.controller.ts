@@ -78,33 +78,27 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response) =>
 
 // this is a Put Route
 //http://localhost:8080/booking/{booking_id}
-export const updateBooking = async (req:Request, res:Response)=>{
-    try{
-        const bookingId=req.params.id
-        const findBooking=await Booking.findByPk(bookingId)
-
-        if(!findBooking){
-            return res.status(404).json({error:"Booking not found"})
-        }
-
-        const validateData=bookingSchema.partial().parse(req.body) // partial takes zod schema in parts to update  
-
-        const booking_price = validateData.booking_price?? (validateData.party_length? validateData.party_length*1 : findBooking.booking_price)
-
-        await findBooking.update({
-            ...validateData,
-            booking_price, 
-            is_paid:validateData.is_paid??findBooking.is_paid
-        })
-        return res.status(200).json(findBooking)
-    }catch(error:any){
-        if(error instanceof ZodError){
-            return res.status(400).json({error: "Validation goes wrong", details:error.errors})
-        }
-        console.error("error Updating booking", error);
-        return res.status(500).json({error:"Internal server error"})
+// En tu booking.controller.ts
+export const updateBooking = async (req: Request, res: Response) => {
+  try {
+    const bookingId = req.params.id;
+    console.log(`Actualizando reserva ID: ${bookingId}`); // Log para depuración
+    
+    const findBooking = await Booking.findByPk(bookingId);
+    if (!findBooking) {
+      return res.status(404).json({ error: "Booking not found" });
     }
 
+    const validateData = bookingSchema.partial().parse(req.body);
+    console.log('Datos recibidos:', validateData); // Verifica los datos recibidos
+
+    await findBooking.update(validateData);
+    
+    return res.status(200).json(findBooking);
+  } catch (error: any) {
+    console.error("Error updating booking:", error);
+    return res.status(500).json({ error: error.message || "Internal server error" });
+  }
 }
 
 //this is a get route
@@ -146,21 +140,77 @@ export const getBookingById=async(req:Request, res:Response)=>{
 //this is a delete route
 //http://localhost:8080/booking/{id}
 
-export const deleteBookingById= async(req:Request, res:Response)=>{
+export const deleteBookingById = async (req: Request, res: Response) => {
     try {
-        const {id}=bookingSchema.parse(req.params)
-        const booking=await Booking.findByPk(id)
+        const { id } = req.params; // No uses bookingSchema.parse aquí
+        
+        if (!id) {
+            return res.status(400).json({ error: "ID is required" });
+        }
 
-        if(!booking){
-            return res.status(404).json({error:"booking doesn't exist"})
+        const booking = await Booking.findByPk(id);
+
+        if (!booking) {
+            return res.status(404).json({ error: "Booking not found" });
         }
-        await booking.destroy()
-        return res.status(200).json({message:"booking deleted successfully"})
-    } catch (error:any) {
-        if(error instanceof ZodError){
-            return res.status(400).json({error:"invalid id", details:error.errors})
-        }
-        console.error("error deleting booking",error)
-        return res.status(500).json({error:"internal server error"})
+
+        await booking.destroy();
+        return res.status(200).json({ message: "Booking deleted successfully" });
+        
+    } catch (error: any) {
+        console.error("Error deleting booking:", error);
+        return res.status(500).json({ 
+            error: "Internal server error",
+            details: error.message // Opcional: solo para desarrollo
+        });
     }
+}
+//----
+export const getBookingsByTerraceId = async (req: Request, res: Response) => {
+  try {
+    const terraceId = req.params.terraceId;
+
+    if (!terraceId) {
+      return res.status(400).json({ error: "Terrace ID is required" });
+    }
+
+    const bookings = await Booking.findAll({
+      where: { terrace_id: terraceId }
+    });
+
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings by terrace:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+ 
+export const markBookingAsShown = async (req: Request, res: Response) => {
+  try {
+    const bookingId = req.params.id;
+    console.log(`Marcando reserva ${bookingId} como mostrada`); // Log de depuración
+    
+    const booking = await Booking.findByPk(bookingId);
+    
+    if (!booking) {
+      console.log(`Reserva ${bookingId} no encontrada`);
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    console.log(`Estado actual de has_shown: ${booking.has_shown}`); // Log de depuración
+    
+    await booking.update({ has_shown: true });
+    console.log(`Reserva ${bookingId} marcada como mostrada correctamente`);
+    
+    return res.status(200).json({ 
+      message: "Booking marked as shown",
+      booking 
+    });
+  } catch (error: any) {
+    console.error("Error marking booking as shown:", error);
+    return res.status(500).json({ 
+      error: error.message || "Internal server error",
+      stack: error.stack // Solo para desarrollo
+    });
+  }
 }
