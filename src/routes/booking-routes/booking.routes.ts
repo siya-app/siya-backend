@@ -1,5 +1,5 @@
 import { Router} from "express"
-import { createBooking, deleteBookingById, getBooking, getBookingById, updateBooking } from "../../controllers/booking-controllers/booking.controller.js"
+import { createBooking, deleteBookingById, getBooking, getBookingById, updateBooking, getBookingsForLoggedUser } from "../../controllers/booking-controllers/booking.controller.js"
 import { isTokenValid } from "../../middleware/auth.middleware.js"
 
 const router=Router()
@@ -10,5 +10,6 @@ router.get("/booking",isTokenValid, getBooking )
 router.get("/booking/:id",isTokenValid, getBookingById )
 router.delete("/booking/id",isTokenValid, deleteBookingById )
 
+router.get("/booking/mine", isTokenValid, getBookingsForLoggedUser);
 
 export default router
