@@ -165,12 +165,10 @@ export const deleteBookingById= async(req:Request, res:Response)=>{
     }
 }
 
-export const getBookingsForLoggedUser = async (req, res) => {
-  const userId = req.userId; // <- obtenido del token por isTokenValid
-
+export const getAllBookings = async (req, res) => {
+  console.log("📥 Entrando en getAllBookings"); // Agrega esto
   try {
     const bookings = await Booking.findAll({
-      where: { user_id: userId },
       include: [
         {
           model: Terrace,
@@ -182,7 +180,8 @@ export const getBookingsForLoggedUser = async (req, res) => {
 
     return res.status(200).json(bookings);
   } catch (error) {
-    console.error("Error al obtener reservas:", error);
-    return res.status(500).json({ message: "Error interno del servidor." });
+    console.error("Error obtenint totes les reserves:", error);
+    return res.status(500).json({ message: "Error intern del servidor." });
   }
 };
+
