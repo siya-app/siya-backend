@@ -30,6 +30,33 @@ export const getReviews = async (req: Request, res: Response) => {
   }
 };
 
+export const getReviewsFromUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.query;
+
+    const whereClause = userId ? { where: { userId: String(userId) } } : {};
+
+    const reviews = await Review.findAll({
+      ...whereClause,
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'email', 'name'],
+        },
+        {
+          model: Terrace,
+          attributes: ['id', 'business_name'],
+        },
+      ],
+    });
+
+    res.json(reviews);
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const postReview = async (req: Request, res: Response) => {
   try {
     // 1. Validació amb Zod
@@ -41,8 +68,12 @@ export const postReview = async (req: Request, res: Response) => {
     const { rating, comment, userId, terraceId } = parsed.data;
 
     // 2. Comprova si l'usuari i la terrassa existeixen
-    const user = await User.findByPk(userId);
-    const terrace = await Terrace.findByPk(terraceId);
+    const user = await User.findByPk(userId, {
+      attributes: ['id', 'email', 'name'], // només els camps que existeixen a Supabase
+    });
+    const terrace = await Terrace.findByPk(terraceId, {
+      attributes: ['id', 'business_name', 'cadastro_ref'], // només els camps que existeixen a Supabase
+    });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -56,10 +87,25 @@ export const postReview = async (req: Request, res: Response) => {
       rating,
       comment,
       userId,
+      userName: user.name, // opcional, però si existeix, l'afegim
       terraceId,
     });
 
+    const reviews = await Review.findAll({
+      where: { terraceId },
+    });
+
+    const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const average = total / reviews.length;
+
+    await Terrace.update(
+      { average_rating: average },
+      { where: { id: terraceId } }
+    );
+    console.log(`🎯 Updated terrace ${terraceId} with average:`, average);
+
     return res.status(201).json(review);
+
   } catch (error) {
     console.error('Error creating review:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -76,8 +122,8 @@ const supabaseAdmin = createClient(
 
 export default supabaseAdmin; */
 
-export const deleteReview =  async (req: Request, res: Response) => {
-    return res.status(503).json({ error: 'deleteReview is temporarily disabled by Carles' });
+export const deleteReview = async (req: Request, res: Response) => {
+  return res.status(503).json({ error: 'deleteReview is temporarily disabled by Carles' });
 
   const { id } = req.params;
   const authHeader = req.headers.authorization;

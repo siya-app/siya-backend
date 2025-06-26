@@ -17,6 +17,7 @@ import { sequelize } from './config/sequelize-config.js';
 import { cronFetch } from './utils/terrace-utils/cron/cronFetch.js';
 import authRoutes from './routes/auth.routes/auth.route.js'
 import reviewRoutes from './routes/review-routes/review.routes.js';
+import favoriteRoutes from './routes/favorite-routes/favorite.routes.js';
 console.log('--- STARTUP TEST LOG ---');
 
 console.log('Environment loaded:', {
@@ -70,6 +71,7 @@ app.use('/', terraceRoutes);
 
 app.use('/', authRoutes)
 app.use('/reviews', reviewRoutes);
+app.use('/favorites', favoriteRoutes);
 app.use("/", tagsRouter);
 
 
