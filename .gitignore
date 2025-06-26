@@ -35,3 +35,5 @@ coverage/
 # Optional (uncomment if needed)
 # package-lock.json (only if using yarn)
 # yarn.lock (only if using npm)
+
+businesses.json
