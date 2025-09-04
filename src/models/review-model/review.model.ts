@@ -17,6 +17,7 @@ export class Review extends Model<
   declare comment: string;
   declare userId: string; // 👈 correspon a id_user
   declare terraceId: string; // 👈 correspon a id_terrace
+  declare userName?: string; // opcional, corresponent a la columna user_name
   declare createdAt: CreationOptional<Date>;
 }
 
@@ -39,6 +40,11 @@ Review.init(
       type: DataTypes.UUID,
       allowNull: false,
       field: 'id_user' // 👈 MAPEIG amb la columna real
+    },
+    userName: {
+      type: DataTypes.STRING(100),
+      allowNull: true, // opcional
+      field: 'user_name' // 👈 MAPEIG amb la columna real
     },
     terraceId: {
       type: DataTypes.UUID,
