@@ -128,11 +128,11 @@ export const deleteReview = async (req: Request, res: Response) => {
   const { id } = req.params;
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (typeof authHeader !== 'string' || !(authHeader as string).startsWith('Bearer ')) {
     return res.status(401).json({ error: 'No token provided' });
   }
 
-  const token = authHeader.split(' ')[1];
+  const token = (authHeader as string).split(' ')[1];
 
   try {
     // 1. Validem el token i obtenim el Firebase UID
@@ -146,12 +146,12 @@ export const deleteReview = async (req: Request, res: Response) => {
     }
 
     // 3. Comprovem que l'autor sigui el mateix que el UID
-    if (review.userId !== uid) {
+    if ((review as Review).userId !== uid) {
       return res.status(403).json({ error: 'Not authorized to delete this review' });
     }
 
     // 4. Eliminem
-    await review.destroy();
+    await (review as Review).destroy();
 
     return res.status(200).json({ message: 'Review deleted successfully' });
 
