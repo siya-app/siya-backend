@@ -71,19 +71,19 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(400).json({ error: 'Email o contraseña inválidos' });
+      return res.status(400).json({ error: 'Email o contrasenya invàlids' });
     }
 
     // --- DEBUGGING (quitar en producción) ---
-    console.log('DEBUG: Contraseña en texto plano (desde req.body):', plainPassword);
-    console.log('DEBUG: Hash de contraseña (desde DB):', user.password_hash);
+    //console.log('DEBUG: Contraseña en texto plano (desde req.body):', plainPassword);
+    //console.log('DEBUG: Hash de contraseña (desde DB):', user.password_hash);
     // --- FIN DEBUGGING ---
 
     // Comparar la contraseña
     // ✅ Usar plainPassword del req.body y user.password_hash del usuario encontrado
     const isPasswordValid = await bcrypt.compare(plainPassword, user.password_hash);
     if (!isPasswordValid) {
-      return res.status(400).json({ error: 'Email o contraseña inválidos' });
+      return res.status(400).json({ error: 'Email o contrasenya invàlids' });
     }
 
     // Generar el token JWT
@@ -103,7 +103,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     // Enviar respuesta exitosa
     res.status(200).json({
-      message: 'Inicio de sesión exitoso',
+      message: 'Inici de sessió amb èxit',
       token,
       user: {
         id: user.id,
@@ -116,7 +116,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
   } catch (error: unknown) {
-    console.error(`❌ Error al iniciar sesión:`, error);
-    return res.status(500).json({ error: 'Error interno del servidor al iniciar sesión.' });
+    console.error(`❌ Error a l'iniciar sessió:`, error);
+    return res.status(500).json({ error: "Error intern del servidor a l'iniciar sessió." });
   }
 };
