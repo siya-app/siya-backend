@@ -120,7 +120,7 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY! // ⚠️ NOMÉS al servidor!
 );
 
-export default supabaseAdmin; */
+export default supabaseAdmin; hola*/
 
 export const deleteReview = async (req: Request, res: Response) => {
   return res.status(503).json({ error: 'deleteReview is temporarily disabled by Carles' });
