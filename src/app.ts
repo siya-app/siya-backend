@@ -48,6 +48,8 @@ app.use((req, res, next) => {
   next();
 });
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+
 app.use(
   cors({
     origin: ["http://localhost:5173", "http://localhost:3000"], // Allow only your frontend // 5173 for vite app
@@ -111,7 +113,7 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("❌ No se pudo conectar a la base de datos:", error);
-    process.exit(1); // Salir si la conexión a la base de datos falla
+    process.exit(1);
   }
 };
 
