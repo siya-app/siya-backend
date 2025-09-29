@@ -15,7 +15,6 @@ export async function fetchDataTerraces() {
             console.error("❌ No terrace records found");
             return [];
         }
-        console.log("✅🍸 Received data from api terraces,", "records.length", records.length, "total length:", totalLength);
         return records;
     }
     catch (error) {

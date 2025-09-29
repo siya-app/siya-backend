@@ -1,4 +1,5 @@
 import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
+// import Tag from '../../models/terrace-model/db/tags-model-sequelize.js'
 import { CustomTerraceSchema } from '../../models/terrace-model/zod/customTerrace-schema.js';
 // http://localhost:8080/terraces
 // GET ALL items
@@ -28,6 +29,7 @@ export const getTerraceById = async (req, res) => {
     try {
         const terrace = await Terrace.findByPk(terraceID);
         // const terrace = await Terrace.findOne({ where: { id: terraceID } });
+        console.log("📦 Terrace fetched:", terrace?.toJSON());
         if (!terrace) {
             return res.status(404).json({ error: "Terrace ID- not found" });
         }
@@ -67,7 +69,7 @@ export const createNewTerrace = async (req, res) => {
 // PUT items/:id
 export const updateTerrace = async (req, res) => {
     const terraceID = req.params.id;
-    const updateData = req.body; // Assuming the update data is sent in the request body
+    const updateData = req.body;
     if (!terraceID) {
         return res.status(400).json({ error: "Invalid or inexistent terrace ID" });
     }
@@ -121,6 +123,26 @@ export const deleteTerrace = async (req, res) => {
         }
         console.error(`❌ Error adding terrace:`, error);
         return res.status(500).json({ error: "Error deleting terrace" });
+    }
+};
+//-----Claim terrace------//
+export const getTerraceByCatastroRef = async (req, res) => {
+    try {
+        const { catastroRef } = req.params;
+        // Busca una terraza por su referencia catastral
+        const terrace = await Terrace.findOne({
+            where: {
+                cadastro_ref: catastroRef // Asumiendo que tu columna se llama 'cadastro_ref'
+            }
+        });
+        if (!terrace) {
+            return res.status(404).json({ message: "No s'ha trobat cap terrassa amb aquesta referència catastral." });
+        }
+        res.status(200).json(terrace);
+    }
+    catch (error) {
+        console.error("Error al buscar terrassa per referència catastral:", error);
+        res.status(500).json({ message: 'Error intern del servidor al buscar la terrassa.' });
     }
 };
 //# sourceMappingURL=terrace.controller.js.map

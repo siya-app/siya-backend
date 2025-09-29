@@ -1,13 +1,11 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../../config/sequelize-config.js';
 //TODO find default images!!
-class Terrace extends Model {
+export class Terrace extends Model {
     id;
     business_name;
     cadastro_ref;
-    street_type;
-    street_address;
-    door_address;
+    address;
     activity_code;
     group_activity_code;
     district_name;
@@ -32,6 +30,8 @@ class Terrace extends Model {
     website;
     profile_pic;
     reservation_fee;
+    tags;
+    phone_num;
 }
 Terrace.init({
     id: {
@@ -47,6 +47,7 @@ Terrace.init({
     cadastro_ref: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true
     },
     address: {
         type: DataTypes.STRING,
@@ -89,11 +90,11 @@ Terrace.init({
         allowNull: false,
     },
     latitude: {
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
     longitude: {
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
     average_price: {
@@ -148,16 +149,33 @@ Terrace.init({
         allowNull: true,
         defaultValue: ''
     },
+    tags: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        defaultValue: {},
+        get() {
+            const rawValue = this.getDataValue('tags');
+            return {
+                cover: [],
+                dietary: [],
+                emotional: [],
+                food: [],
+                placement: [],
+                ...rawValue
+            };
+        }
+    },
+    phone_num: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: ''
+    }
 }, {
     sequelize,
     modelName: 'Terrace',
     tableName: 'terraces',
+    schema: 'public',
     timestamps: false,
 });
 export default Terrace;
-// has_promos
-// reservation_fee
-// is_premium
-// is_verified
-// instagram_account
 //# sourceMappingURL=terrace-model-sequelize.js.map

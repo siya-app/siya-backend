@@ -1,149 +1,46 @@
 import { fetchAllDataFromApis } from "../../services/terrace-services/all.data.service.js";
 import { matchByCoords } from "./validators/coordsValidator.js";
-import { matchByCoordsAndAddress } from "./validators/addressValidator.js";
-import { createCustomTerrace } from "./validators/createCustomTerrace.js";
-// import type { BusinessApiType } from "../../models/terrace-model/zod/business-schema.js";
-// import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+import { createOrUpdateTerrace } from "./validators/createOrUpdateTerrace.js";
+// import { readJsonArray } from "../../utils/terrace-utils/readJson.js";
 const customTerracesData = [];
+let uniqueBusinesses = [];
+let count = 0;
 export async function createCustomValidatedTerrace() {
-    const { businesses, terraces } = await fetchAllDataFromApis();
-    let customTerraces = [];
-    const unmatchedTerraces = [];
-    for (let i = 0; i < terraces.length; i++) {
-        const terrace = terraces[i];
-        let matchingBusinesses = matchByCoords(terrace, businesses);
-        console.warn(`matchingBusinesses after matchByCoords --> ${matchingBusinesses}`);
-        // if(matchingBusinesses !== null ) console.warn(matchingBusinesses[0])
-        if (!matchingBusinesses || matchingBusinesses.length === 0) {
-            // No coords match → add to unmatched for manual review
-            unmatchedTerraces.push(terrace);
-            console.warn(`no match with coords, trying matching by address`);
-            continue;
-        }
-        if (matchingBusinesses.length === 1) {
-            // Only one match by coords → create directly
-            // find index but how - increment index dynamically
-            const custom = createCustomTerrace(terrace, matchingBusinesses[(0)]);
-            console.warn(`customterrace to create --> ${custom}`);
-            customTerraces.push(custom);
-            matchingBusinesses = [];
-            continue;
-        }
-        else {
-            const { validMatches, invalidMatches } = matchByCoordsAndAddress(terrace, matchingBusinesses) || {};
-            if (!validMatches || validMatches.length !== 1) {
-                console.error(`terrace goes to unmatchedTerraces --> ${terrace}`);
-                unmatchedTerraces.push(terrace);
-                matchingBusinesses = [];
-            }
-            else {
-                const custom = createCustomTerrace(terrace, validMatches[i]);
-                console.warn(`custom match --> ${custom}`);
-                customTerracesData.push(custom);
-                // console.log(`custom -> ${custom}, validMatches[i] -> ${validMatches[i]}`)
-                // customTerraces.push(custom);
-                console.warn(`here we would create a terrace if it is a valid match`);
-            }
-        }
-    }
     try {
-        if (customTerraces.length > 0) {
-            customTerracesData.push(customTerraces);
-            console.warn(`here we would bulkCreate terraces`);
-            // await Terrace.bulkCreate(customTerraces, {
-            //     updateOnDuplicate: [
-            //         'business_name',
-            //         'tables',
-            //         'seats',
-            //         'opening_hours',
-            //         'average_price',
-            //         'average_rating',
-            //         'has_wifi',
-            //         'pet_friendly',
-            //         'can_smoke',
-            //         'has_kitchen'
-            //     ]
-            // })
-            console.warn(`customterraces is bigger than zero wiiii - the object would be created`);
+        const { businesses, terraces } = await fetchAllDataFromApis();
+        // fullBusinesses = await readJsonArray<BusinessApiType>("./businesses-restaurants.json");
+        // fullTerraces = await readJsonArray<TerraceApiType>("./terraces.json");
+        // businesses = fullBusinesses.slice(0,100);
+        // terraces = fullTerraces.slice(0,200);
+        console.log('Loaded businesses in createCustomValidatedTerrace():', businesses.length);
+        console.log('Loaded terraces: in createCustomValidatedTerrace()', terraces.length);
+        const unmatchedTerraces = [];
+        for (let i = 0; i < terraces.length; i++) {
+            const terrace = terraces[i];
+            if (!terrace || !businesses) {
+                console.error(`no data to validate`);
+                continue;
+            }
+            let matchingBusinesses = matchByCoords(terrace, businesses, 0.000063) || [];
+            uniqueBusinesses = Array.from(new Map(matchingBusinesses.map(biz => [biz.ID_Global, biz])).values());
+            if (uniqueBusinesses.length === 0) {
+                unmatchedTerraces.push(terrace);
+                continue;
+            }
+            console.log(`Terrace ${i} (${terrace.EMPLACAMENT}) matched ${uniqueBusinesses.length} businesses`);
+            for (const biz of uniqueBusinesses) {
+                count++;
+                console.warn(biz.Nom_Local);
+                await createOrUpdateTerrace(terrace, biz);
+            }
         }
-        console.warn(`Inserted or updated ${customTerraces.length} terraces.`);
         if (unmatchedTerraces.length > 0) {
             console.warn(`There are ${unmatchedTerraces.length} unmatched terraces.`);
+            console.warn(`There are ${customTerracesData.length} matched terraces.`);
         }
     }
-    catch (err) {
-        console.error('❌ Error saving terraces to DB:', err);
+    catch (error) {
+        console.error('❌ Error fetching data:', error);
     }
 }
-// aqui iria el cron
-// createCustomValidatedTerrace();
-// for (let i = 0; i < terraces.length; i++) {
-//     const terrace = terraces[i] as TerraceApiType;
-//     let businessMatchedByCoords: BusinessApiType[] = businesses.filter(biz =>
-//         biz.Latitud === terrace.LATITUD &&
-//         biz.Longitud === terrace.LONGITUD);
-//     if (businessMatchedByCoords.length > 1) {
-//         const oneMatchOnlyBusiness = businessMatchedByCoords.find((match) => {
-//             return (
-//                 terrace.EMPLACAMENT.includes(match.Nom_Via) &&
-//                 terrace.EMPLACAMENT.includes(match.Porta)
-//             )
-//         });
-//         businessMatchedByCoords = oneMatchOnlyBusiness ? [oneMatchOnlyBusiness] : [];
-//     }
-//     for (const biz of businessMatchedByCoords) {
-//         customTerraces.push({
-//             id: biz.ID_Global,
-//             business_name: biz.Nom_CComercial,
-//             cadastro_ref: biz.Referencia_Cadastral,
-//             street_type: biz.Nom_Via,
-//             street_address: biz.Nom_Local,
-//             door_address: parseInt(biz.Porta) || 0,
-//             activity_code: parseInt(biz.Codi_Activitat_2022) || 0,
-//             group_activity_code: parseInt(biz.Codi_Activitat_2022) || 0,
-//             postal_code: undefined,
-//             district_name: biz.Codi_Districte,
-//             district_code: parseInt(biz.Codi_Districte) || 0,
-//             neighbourhood_name: biz.Nom_Barri,
-//             neighbourhood_code: parseInt(biz.Codi_Barri) || 0,
-//             opening_hours: undefined,
-//             tables: parseInt(terrace.TAULES) || 0,
-//             seats: parseInt(terrace.CADIRES) || 0,
-//             latitude: parseFloat(terrace.LATITUD) || 0,
-//             longitude: parseFloat(terrace.LONGITUD) || 0,
-//             average_price: undefined,
-//             average_rating: undefined,
-//             has_wifi: undefined,
-//             pet_friendly: undefined,
-//             can_smoke: undefined,
-//             has_kitchen: undefined,
-//         });
-//     }
-// }
-// // bulkCreate prevents messing the loop
-// // by saving the objects after it
-// // if Terrace.create() would be inside the loop
-// // --> low performance
-// // updateOnDuplicate will change only the following properties
-// // when updating ddbb
-// //! what if a restaurant changes location?
-// try {
-//     await Terrace.bulkCreate(customTerraces, {
-//         updateOnDuplicate: [
-//             'business_name',
-//             'tables',
-//             'seats',
-//             'opening_hours',
-//             'average_price',
-//             'average_rating',
-//             'has_wifi',
-//             'pet_friendly',
-//             'can_smoke',
-//             'has_kitchen'
-//         ]
-//     });
-// } catch(err) {
-//     console.error('❌ Error saving customTerraces to DB:', err);
-//     console.error(err instanceof Error ? err.stack : err);
-// }
 //# sourceMappingURL=terrace.validator.js.map
