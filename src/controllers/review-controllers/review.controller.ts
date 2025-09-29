@@ -59,7 +59,6 @@ export const getReviewsFromUser = async (req: Request, res: Response) => {
 
 export const postReview = async (req: Request, res: Response) => {
   try {
-    // 1. Validació amb Zod
     const parsed = reviewSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.format() });
@@ -67,12 +66,11 @@ export const postReview = async (req: Request, res: Response) => {
 
     const { rating, comment, userId, terraceId } = parsed.data;
 
-    // 2. Comprova si l'usuari i la terrassa existeixen
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'email', 'name'], // només els camps que existeixen a Supabase
+      attributes: ['id', 'email', 'name'],
     });
     const terrace = await Terrace.findByPk(terraceId, {
-      attributes: ['id', 'business_name', 'cadastro_ref'], // només els camps que existeixen a Supabase
+      attributes: ['id', 'business_name', 'cadastro_ref'],
     });
 
     if (!user) {
@@ -82,12 +80,11 @@ export const postReview = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Terrace not found' });
     }
 
-    // 3. Crea la review
     const review = await Review.create({
       rating,
       comment,
       userId,
-      userName: user.name, // opcional, però si existeix, l'afegim
+      userName: user.name, 
       terraceId,
     });
 
@@ -112,51 +109,6 @@ export const postReview = async (req: Request, res: Response) => {
   }
 };
 
-// config/supabase-admin.ts //PARA QUE FUNCIONE EL DELETE NECESITO ESTO EN EL SERVIDOR:
-/* import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // ⚠️ NOMÉS al servidor!
-);
 
-export default supabaseAdmin; hola*/
 
-export const deleteReview = async (req: Request, res: Response) => {
-  return res.status(503).json({ error: 'deleteReview is temporarily disabled by Carles' });
-
-  const { id } = req.params;
-  const authHeader = req.headers.authorization;
-
-  if (typeof authHeader !== 'string' || !(authHeader as string).startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
-
-  const token = (authHeader as string).split(' ')[1];
-
-  try {
-    // 1. Validem el token i obtenim el Firebase UID
-    const decoded = await admin.auth().verifyIdToken(token); /* !!aquesta linea em dona error al admin!!! */
-    const uid = decoded.uid;
-
-    // 2. Busquem la review
-    const review = await Review.findByPk(id);
-    if (!review) {
-      return res.status(404).json({ error: 'Review not found' });
-    }
-
-    // 3. Comprovem que l'autor sigui el mateix que el UID
-    if ((review as Review).userId !== uid) {
-      return res.status(403).json({ error: 'Not authorized to delete this review' });
-    }
-
-    // 4. Eliminem
-    await (review as Review).destroy();
-
-    return res.status(200).json({ message: 'Review deleted successfully' });
-
-  } catch (err) {
-    console.error('Error deleting review:', err);
-    return res.status(500).json({ error: 'Failed to delete review' });
-  }
-};
