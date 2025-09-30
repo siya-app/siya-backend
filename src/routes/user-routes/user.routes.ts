@@ -9,7 +9,7 @@ const router = Router();
 router.post('/login', loginUser);
 
 router.post('/users', createUser);
-router.get('/users', getAllUsers); // Do we need this route?????
+router.get('/users', getAllUsers);
 router.get('/users/:id', isTokenValid, getUserByEmailOrId);
 router.get('/perfil', isTokenValid, getLoggedInUserProfile);
 
