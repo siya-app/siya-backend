@@ -1,12 +1,11 @@
-
-import { Request, Response } from 'express';
-import Review from '../../models/review-model/review.model.js';
-import User from '../../models/user-model/user.model.js';
-import Terrace from '../../models/terrace-model/db/terrace-model-sequelize.js';
-import '../../models/associations/associations.ts'
+import { Request, Response } from "express";
+import Review from "../../models/review-model/review.model.js";
+import User from "../../models/user-model/user.model.js";
+import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
+import "../../models/associations/associations.js";
 //import supabaseAdmin from '../config/supabase-admin.js';
 
-import { reviewSchema } from '../../models/review-model/zod/review-schema.js';
+import { reviewSchema } from "../../models/review-model/zod/review-schema.js";
 
 export const getReviews = async (req: Request, res: Response) => {
   try {
@@ -25,8 +24,8 @@ export const getReviews = async (req: Request, res: Response) => {
 
     res.json(reviews);
   } catch (error) {
-    console.error('Error fetching reviews:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching reviews:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -41,19 +40,19 @@ export const getReviewsFromUser = async (req: Request, res: Response) => {
       include: [
         {
           model: User,
-          attributes: ['id', 'email', 'name'],
+          attributes: ["id", "email", "name"],
         },
         {
           model: Terrace,
-          attributes: ['id', 'business_name'],
+          attributes: ["id", "business_name"],
         },
       ],
     });
 
     res.json(reviews);
   } catch (error) {
-    console.error('Error fetching reviews:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching reviews:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -67,24 +66,24 @@ export const postReview = async (req: Request, res: Response) => {
     const { rating, comment, userId, terraceId } = parsed.data;
 
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'email', 'name'],
+      attributes: ["id", "email", "name"],
     });
     const terrace = await Terrace.findByPk(terraceId, {
-      attributes: ['id', 'business_name', 'cadastro_ref'],
+      attributes: ["id", "business_name", "cadastro_ref"],
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
     if (!terrace) {
-      return res.status(404).json({ error: 'Terrace not found' });
+      return res.status(404).json({ error: "Terrace not found" });
     }
 
     const review = await Review.create({
       rating,
       comment,
       userId,
-      userName: user.name, 
+      userName: user.name,
       terraceId,
     });
 
@@ -102,13 +101,8 @@ export const postReview = async (req: Request, res: Response) => {
     console.log(`🎯 Updated terrace ${terraceId} with average:`, average);
 
     return res.status(201).json(review);
-
   } catch (error) {
-    console.error('Error creating review:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Error creating review:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
-
-
