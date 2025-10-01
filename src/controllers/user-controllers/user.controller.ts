@@ -333,3 +333,50 @@ export const claimTerraceOwnership = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error intern del servidor al reclamar la propietat de la terrassa.' });
   }
 };
+
+export const unclaimTerraceOwnership = async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.params.userId;
+  const { password } = req.body;
+
+  try {
+    // Verificar autenticación
+    if (!req.user || req.user.id !== userId) {
+      return res.status(403).json({ error: "No tens permisos per fer aquesta acció." });
+    }
+
+    // Obtener el usuario
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ error: "Usuari no trobat." });
+    }
+
+    // Verificar que sea owner
+    if (user.role !== "owner" || !user.id_terrace) {
+      return res.status(400).json({ error: "Aquest usuari no és propietari de cap terrassa." });
+    }
+
+    // Verificar contraseña
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Contrasenya incorrecta." });
+    }
+
+    // Liberar la terraza
+    const terrace = await Terrace.findByPk(user.id_terrace);
+    if (terrace) {
+      terrace.is_claimed = false;
+      await terrace.save();
+    }
+
+    // Actualizar el usuario
+    user.role = "client";
+    user.id_terrace = null;
+    await user.save();
+
+    res.status(200).json({ message: "Has deixat de ser propietari/ària de la terrassa." });
+
+  } catch (error) {
+    console.error("❌ Error a l'unclaim:", error);
+    res.status(500).json({ error: "Error intern del servidor a l'unclaim de la terrassa." });
+  }
+};
