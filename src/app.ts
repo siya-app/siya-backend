@@ -48,16 +48,39 @@ app.use((req, res, next) => {
   next();
 });
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+// Read ALLOWED_ORIGINS from environment (comma-separated list), fallback to localhost for dev
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173", "http://localhost:3000"];
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"], // Allow only your frontend // 5173 for vite app
+    // Dynamically check if the request origin is allowed
+    origin: (origin, callback) => {
+      // If no origin (like Postman, curl), or the origin is in our allowed list → allow it
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        // Otherwise block it
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed methods
     credentials: true, // If cookies/auth headers needed!
-    //TODO take a look at middleware headers auth
+    // TODO: take a look at middleware headers auth
   })
 );
+
+// const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "http://localhost:3000"], // Allow only your frontend // 5173 for vite app
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed methods
+//     credentials: true, // If cookies/auth headers needed!
+//     //TODO take a look at middleware headers auth
+//   })
+// );
 
 //This middleware parses incoming JSON data from the request body, limit 50mb for saving space
 app.use(express.json({ limit: "50mb" }));
