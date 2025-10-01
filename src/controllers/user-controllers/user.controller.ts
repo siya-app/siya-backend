@@ -373,7 +373,16 @@ export const unclaimTerraceOwnership = async (req: AuthenticatedRequest, res: Re
     user.id_terrace = null;
     await user.save();
 
-    res.status(200).json({ message: "Has deixat de ser propietari/ària de la terrassa." });
+    res.status(200).json({ 
+  message: "Has deixat de ser propietari/ària de la terrassa.",
+  updatedUser: {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    id_terrace: user.id_terrace,
+  }
+});
 
   } catch (error) {
     console.error("❌ Error a l'unclaim:", error);
