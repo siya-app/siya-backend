@@ -1,22 +1,27 @@
 import { Router } from "express";
 import {
-    getAllTerraces,
-    getTerraceById,
-    createNewTerrace,
-    updateTerrace,
-    deleteTerrace,
-    getTerraceByCatastroRef
+  getAllTerraces,
+  getTerraceById,
+  createNewTerrace,
+  //updateTerrace,
+  deleteTerrace,
+  getTerraceByCatastroRef,
+  updateTerraceWithPassword,
 } from "../../controllers/terrace-controllers/terrace.controller.js";
+
+import { isTokenValid } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 
 router.get("/terraces", getAllTerraces);
 router.post("/terraces", createNewTerrace);
 router.get("/terraces/:id", getTerraceById);
-router.put("/terraces/:id", updateTerrace);
+router.put("/terraces/:id", isTokenValid, updateTerraceWithPassword);
+//router.put("/terraces/:id", updateTerrace);
 router.delete("/terraces/:id", deleteTerrace);
 
 router.get("/terraces/by-catastro/:catastroRef", getTerraceByCatastroRef);
+
 
 export default router;
 
