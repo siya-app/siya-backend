@@ -2,9 +2,8 @@ import { ZodError } from "zod";
 import Booking from "../../models/booking-model/booking.model.js";
 import { bookingSchema } from "../../models/booking-model/zod/booking.schema.js";
 import { Request, Response } from "express";
-import { existsSync } from "fs";
-import { error } from "console";
 import { AuthenticatedRequest } from "../../middleware/auth.middleware.js";
+import Terrace from "../../models/terrace-model/db/terrace-model-sequelize.js";
 
 
 
@@ -214,3 +213,29 @@ export const markBookingAsShown = async (req: Request, res: Response) => {
     });
   }
 }
+
+export const getBookingsByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+console.log("User ID recibido:", userId);
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const bookings = await Booking.findAll({
+      where: { user_id: userId },
+      include: [
+        {
+          model: Terrace,
+          attributes: ["business_name", "address"],
+        },
+      ],
+      order: [["booking_date", "DESC"]],
+    });
+
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings by user:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
