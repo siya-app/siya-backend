@@ -7,6 +7,7 @@ app = 'siya-backend'
 primary_region = 'cdg'
 
 [build]
+  image = "docker.io/roro833/siya-backend:latest"
 
 [http_service]
   internal_port = 8080
